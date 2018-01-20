@@ -1,5 +1,7 @@
 <?php
 
+use function foo\func;
+
 /*
 |--------------------------------------------------------------------------
 | Application Routes
@@ -11,6 +13,18 @@
 |
 */
 
+
 $router->get('/', function () use ($router) {
     return $router->app->version();
 });
+
+
+//add by chenyiwei on 20180120 21:45
+    $router->group(['prefix' => config('app.api.rootname').'/'.config('app.version')] , function() use( $router ){
+    
+    $router->get( 'posts/{postId}' , 'WPAPIController@getPostDetail' ) ;
+
+});
+//end add
+
+

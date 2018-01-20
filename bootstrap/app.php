@@ -23,6 +23,10 @@ $app = new Laravel\Lumen\Application(
     realpath(__DIR__.'/../')
 );
 
+//add by chenyiwei on 20180120 21:38
+require_once __DIR__.'/config.php';
+//end
+
 // $app->withFacades();
 
 // $app->withEloquent();
