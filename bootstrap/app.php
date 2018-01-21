@@ -27,7 +27,8 @@ $app = new Laravel\Lumen\Application(
 require_once __DIR__.'/config.php';
 //end
 
-// $app->withFacades();
+//open facades by chenyiwei on 20180121
+$app->withFacades();
 
 // $app->withEloquent();
 
