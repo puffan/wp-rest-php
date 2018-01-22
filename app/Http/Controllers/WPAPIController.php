@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
+use App\Models\WPAPIModel\WPAPIModel;
 use App\Components\Response;
 
 
@@ -24,6 +25,10 @@ class WPAPIController extends Controller
     }
 
     public function getPostDetail( Request $req ){
-        Response::sendCreated( 'OK result' , 'location=good' ) ;
+        $a = new WPAPIModel() ;
+        $rs = $a->getPostDetail() ;
+        $aaa = $rs->post_content ;
+        
+        Response::sendCreated( $aaa , 'location=good' ) ;
     }
 }
