@@ -3,7 +3,7 @@ namespace App\Components ;
 
 class Response{
     
-    public static function send( $data=[] , $statusCode=200 ){
+   /* public static function send( $data=[] , $statusCode=200 ){
         $resp=[
             'api_version' => config( 'app.version' ) ,
         ];
@@ -11,13 +11,24 @@ class Response{
         header( 'HTTP/1.0 '.$statusCode ) ;
         header( 'Content-Type: application/json' ) ;
         die( json_encode( $resp ) ) ;
+    }*/
+    
+    public static function send( $data=[] , $statusCode=200, $statusId=0 ){
+        $resp=[
+            'status' => $statusId ,
+            'code'   => $statusCode ,
+        ];
+        $resp = array_merge( $resp , $data ) ;
+        header( 'HTTP/1.0 '.$statusCode ) ;
+        header( 'Content-Type: application/json' ) ;
+        die( json_encode( $resp ) ) ;
     }
     
-    public static function sendResult( $result='' , $statusCode = 200 ){
+    public static function sendResult( $result='' , $statusCode = 200 , $statusId = 0 ){
         $resp=[
-            'result'=> $result,
+            'data'=> $result,
         ] ;
-        self::send( $resp , $statusCode ) ;
+        self::send( $resp , $statusCode , $statusId ) ;
     }
     
     public static function sendCreated( $result='' , $location='' ){

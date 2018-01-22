@@ -20,9 +20,20 @@ $router->get('/', function () use ($router) {
 
 
 //add by chenyiwei on 20180120 21:45
-    $router->group(['prefix' => config('app.api.rootname').'/'.config('app.version')] , function() use( $router ){
+$router->group(['prefix' => config('app.api.rootname').'/'.config('app.version')] , function() use( $router ){
     
     $router->get( 'posts/{postId}' , 'WPAPIController@getPostDetail' ) ;
+    $router->get( 'siteid' , 'WPAPIController@getAllCategoriesByTenant' ) ;  //  {"api_version":"v1","result":2}
+    $router->get( 'totalterms' , 'WPAPIController@getCategoriesCount' ) ;  //  {"api_version":"v1","result":2}
+    $router->get( 'termsinnerjointaxonomy' , 'WPAPIController@getTermsInnjerjoinTaxonomy' ) ;
+    $router->get( 'termmeta' , 'WPAPIController@getTermmeta' ) ;
+   // $router->get( 'categories' , 'WPAPIController@getAllCategoriesByTenant' ) ;
+   
+    
+    //comments
+    $router->get( 'parentcomment' , 'WPAPICommentController@getParentComment' ) ;
+    $router->get( 'childcomment' , 'WPAPICommentController@getChildComment' ) ;
+    $router->get( 'comments' , 'WPAPICommentController@getCommentList' ) ;
 
 });
 //end add
