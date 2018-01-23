@@ -5,7 +5,7 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use App\Models\WPAPIModel\WPAPICommentModel;
 use App\Components\Response;
-
+use App\Utils\WPAPIUserUtil ;
 
 /**
  *
@@ -111,7 +111,10 @@ class WPAPICommentController extends WPAPIBaseController{
             return  $singleCommentObj ;
         }
         
-        $singleCommentObj->status = self::formatCommentObjStatus( $singleCommentObj->status ) ;
+        $singleCommentObj = self::formatCommentObjStatus( $singleCommentObj ) ; 
+        $singleCommentObj = self::formatCommentObjUser( $singleCommentObj )  ; 
+        $singleCommentObj = self::formatCommentObjParent( $singleCommentObj )  ;
+        
         return $singleCommentObj ;
     }
     
@@ -126,11 +129,36 @@ class WPAPICommentController extends WPAPIBaseController{
         return $resultArr ;
     }
         
-    private static function formatCommentObjStatus( $status ){
-        if( $status == 1 ){
-            return 'approved' ;
+    
+    private static function formatCommentObjStatus( $singleCommentObj ){
+        if( !$singleCommentObj ){
+            return $singleCommentObj ;
+        }
+        
+        if( $singleCommentObj->status == 1 ){
+            $singleCommentObj->status = 'approved' ;
+        }
+        
+        return $singleCommentObj ;
+    }
+    
+    private static function formatCommentObjParent( $singleCommentObj ){
+        if( !$singleCommentObj ){
+            return $singleCommentObj ;
+        }
+        
+        $singleCommentObj->parent = 0 ;     
+        return $singleCommentObj ;
+    }
+    
+    private static function formatCommentObjUser( $singleCommentObj ){
+        $wpSingleUserMeta = WPAPIUserUtil::getWPSingleUserMetaById( $singleCommentObj->author ) ;
+        if( !$wpSingleUserMeta || !$wpSingleUserMeta->meta_value ){
+            $singleCommentObj->accountid = '' ; // not find accountid , set accountid to emtpy
+            return $singleCommentObj ;
         }else{
-            return $status ;
+            $singleCommentObj->accountid = $wpSingleUserMeta->meta_value ;
+            return $singleCommentObj ;
         }
     }
     

@@ -4,6 +4,7 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Database\Query ;
 use App\Utils\WPAPISiteUtil ;
 
+
 /**
  *
  * @author chenyiwei on 20180122
@@ -12,7 +13,7 @@ use App\Utils\WPAPISiteUtil ;
 class WPAPICommentModel{
     
     public function getParentCommentList( $postId , $offset , $limit , $order ){
-        $sql = 'select comment_ID as id, comment_post_ID as post, 0 as parent, user_id as author, \'author_name\' as author_name, comment_date_gmt as date, comment_content as content, comment_approved as status, \'test1\' as accountid  from '.WPAPISiteUtil::getSiteTableName('wp_%_comments').' '.
+        $sql = 'select comment_ID as id, comment_post_ID as post, comment_parent as parent, user_id as author, comment_author as author_name, comment_date_gmt as date, comment_content as content, comment_approved as status, comment_author as accountid  from '.WPAPISiteUtil::getSiteTableName('wp_%_comments').' '.
                    'where comment_approved=\'1\' and comment_post_id='.$postId.' and comment_type=\'\' and comment_parent=0 '.
                    'order by comment_date_gmt '.$order.', comment_id '.$order.' limit '.$offset.','.$limit.' ; ' ;
         $rs = DB::select( $sql ) ;
@@ -36,7 +37,7 @@ class WPAPICommentModel{
     }
     
     public function  getCommentById( $commentId ){
-        $sql = 'select comment_ID as id, comment_post_ID as post, 0 as parent, user_id as author, \'author_name\' as author_name, comment_date_gmt as date, comment_content as content, comment_approved as status, \'test1\' as accountid  from '.WPAPISiteUtil::getSiteTableName('wp_%_comments').' '.
+        $sql = 'select comment_ID as id, comment_post_ID as post, comment_parent as parent, user_id as author, comment_author as author_name, comment_date_gmt as date, comment_content as content, comment_approved as status, comment_author as accountid  from '.WPAPISiteUtil::getSiteTableName('wp_%_comments').' '.
             'where comment_approved=\'1\' and comment_ID='.$commentId.' and comment_type=\'\' '.
             '; ' ;
         $rs = DB::select( $sql ) ;
@@ -48,7 +49,7 @@ class WPAPICommentModel{
     }
     
     public function getChildCommentList( $parentCommentId , $postId , $offset , $limit , $order ){
-        $sql = 'select comment_ID as id, comment_post_ID as post, 0 as parent, user_id as author, \'author_name\' as author_name, comment_date_gmt as date, comment_content as content, comment_approved as status, \'test1\' as accountid  from '.WPAPISiteUtil::getSiteTableName('wp_%_comments').' '.
+        $sql = 'select comment_ID as id, comment_post_ID as post, comment_parent as parent, user_id as author, comment_author as author_name, comment_date_gmt as date, comment_content as content, comment_approved as status, comment_author as accountid  from '.WPAPISiteUtil::getSiteTableName('wp_%_comments').' '.
             'where comment_approved=\'1\' and comment_post_id='.$postId.' and comment_type=\'\' and comment_parent='.$parentCommentId.' '.
             'order by comment_date_gmt '.$order.', comment_id '.$order.' limit '.$offset.','.$limit.' ; ' ;
         $rs = DB::select( $sql ) ;

@@ -9,7 +9,7 @@ class WPAPISiteUtil{
     const VALID_TENANTID_DEFAULT = '' ;
     const VALID_SITEID_DEFAULT = 1 ;
     
-    protected static $siteId = '' ;
+    protected static $siteId = 0 ;
     
     public function __construct(){}
     
@@ -30,6 +30,9 @@ class WPAPISiteUtil{
     }
     
     public static function getSiteId(){
+        if( self::$siteId ){
+            return self::$siteId ;
+        }
         $sitePath = self::getSitePath() ;
         $wpapiModel = new WPAPIModel() ;
         $siteId = $wpapiModel->getSiteId( $sitePath ) ;
