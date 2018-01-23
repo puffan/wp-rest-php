@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
+use App\Models\WPAPIModel\WPAPIModel;
 use App\Models\WPAPIModel\WPAPIPostModel;
 use App\Utils\WPAPIUserUtil;
 use App\Components\Response;
@@ -31,6 +32,8 @@ class WPAPIPostController extends WPAPIBaseController{
         $singlePostObj = self::formatPostObjTags( $singlePostObj ) ;
         $singlePostObj = self::formatPostObjUser( $singlePostObj ) ;
         $singlePostObj = self::formatPostObjTerm( $singlePostObj ) ;
+        $singlePostObj = self::formatPostObjImgdata( $singlePostObj ) ;
+        
         
         Response::sendResult( $singlePostObj , 200 , 0 ) ;
     }
@@ -77,6 +80,20 @@ class WPAPIPostController extends WPAPIBaseController{
         $singlePostObj->categories = $postTermMultipleObj ;
         return $singlePostObj ;
         
+    }
+    
+    private static function formatPostObjImgdata( $singlePostObj ){
+        if( !$singlePostObj ){
+            return $singlePostObj ;
+        }
+        $wpApiModel = new WPAPIModel() ;
+        $postImgDataStr = $wpApiModel->getPostImgData( $singlePostObj->id ) ;
+        if( !$postImgDataStr ){
+            return $singlePostObj ;
+        }else{
+            $singlePostObj->welink_imgData = $postImgDataStr ;
+            return $singlePostObj ;
+        }
     }
 }
     
