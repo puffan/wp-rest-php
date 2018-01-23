@@ -6,6 +6,7 @@ use Illuminate\Http\Request;
 use App\Models\WPAPIModel\WPAPIPostModel;
 use App\Utils\WPAPIUserUtil;
 use App\Components\Response;
+use App\Models\WPAPIModel\WPAPICategoryModel;
 
 /**
  *
@@ -29,6 +30,7 @@ class WPAPIPostController extends WPAPIBaseController{
         
         $singlePostObj = self::formatPostObjTags( $singlePostObj ) ;
         $singlePostObj = self::formatPostObjUser( $singlePostObj ) ;
+        $singlePostObj = self::formatPostObjTerm( $singlePostObj ) ;
         
         Response::sendResult( $singlePostObj , 200 , 0 ) ;
     }
@@ -61,5 +63,20 @@ class WPAPIPostController extends WPAPIBaseController{
         
     }
     
+    
+    private static function formatPostObjTerm( $singlePostObj ){
+        if( !$singlePostObj ){
+            return $singlePostObj ;
+        }
+        $wpApiCategoyModel = new WPAPICategoryModel() ;
+        $postTermMultipleObj = $wpApiCategoyModel->getPostTermByPostId( $singlePostObj->id ) ;
+        if( !$postTermMultipleObj ){
+            return $singlePostObj ;
+        }
+        
+        $singlePostObj->categories = $postTermMultipleObj ;
+        return $singlePostObj ;
+        
+    }
 }
     

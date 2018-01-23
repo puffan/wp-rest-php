@@ -39,5 +39,19 @@ class WPAPICategoryModel{
         }
     }
     
+    //20180123
+    public function getPostTermByPostId( $postId ){
+        $postId = intval( $postId ) ;
+        $sql = 'select te.term_id, te.name as term_name from '.WPAPISiteUtil::getSiteTableName('wp_%_term_relationships').' as tr inner join '.WPAPISiteUtil::getSiteTableName('wp_%_term_taxonomy').' as tt on tr.term_taxonomy_id=tt.term_taxonomy_id '.
+                   'inner join '.WPAPISiteUtil::getSiteTableName('wp_%_terms').' as te on tt.term_id=te.term_id '.
+                   'where tr.object_id='.$postId.' and tt.taxonomy=\'category\' '.
+                   'order by te.name asc';
+        $rs = DB::select( $sql ) ;
+        if( !$rs ){
+            return false ;
+        }else{
+            return $rs ;
+        }
+    }
     
 }
