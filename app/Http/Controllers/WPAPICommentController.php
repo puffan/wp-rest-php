@@ -17,6 +17,7 @@ class WPAPICommentController extends Controller{
     const VALID_ORDER_VALUE = array( 'desc'=>'desc' , 'asc'=>'asc' ) ;
     const VALID_ORDER_DEFAULT = 'desc' ;
     const VALID_PER_PAGE_DEFAULT  = 20 ;
+    const VALID_CHILD_COMMENT_NUM_DEFAULT = 3 ;
     const VALID_CURRENT_PAGE_NUM_DEFAULT = 1 ;
     
     public function __construct(){}
@@ -63,7 +64,7 @@ class WPAPICommentController extends Controller{
             $dataObj->parentCount = $parentCommentCountObj->parentCount ;
 
             foreach( $parentCommentObj as $key=>$value ){
-                $childCommentObj      = $commentModel->getChildCommentList( $value->id , $postId , 0 , 3 , $order) ;
+                $childCommentObj      = $commentModel->getChildCommentList( $value->id , $postId , 0 , self::VALID_CHILD_COMMENT_NUM_DEFAULT , self::VALID_ORDER_DEFAULT ) ;
                 $childCommentObj = self::formatMultipleCommentObj( $childCommentObj ) ;
                 $childCommentCountObj = $commentModel->getChildCommentCount( $value->id , $postId ) ;
                 $parentCommentObj[$key]->childCount = $childCommentCountObj->childCount ;
