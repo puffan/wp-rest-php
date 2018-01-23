@@ -39,7 +39,7 @@ class WPAPICategoryModel{
         }
     }
     
-    //20180123
+    //by chenyiwei on 20180123
     public function getPostTermByPostId( $postId ){
         $postId = intval( $postId ) ;
         $sql = 'select te.term_id, te.name as term_name from '.WPAPISiteUtil::getSiteTableName('wp_%_term_relationships').' as tr inner join '.WPAPISiteUtil::getSiteTableName('wp_%_term_taxonomy').' as tt on tr.term_taxonomy_id=tt.term_taxonomy_id '.
@@ -53,5 +53,25 @@ class WPAPICategoryModel{
             return $rs ;
         }
     }
+    
+     //added by liuhongqiang 20180123
+    public function getTaxonomyIds($categoryIds){
+        IF(!$categoryIds){
+            return false;
+        }
+
+        $inSqlStr = ' in( '.$categoryIds.' ) ' ;
+
+        $sql = 'SELECT term_taxonomy_id from '.WPAPISiteUtil::getSiteTableName('wp_%_term_taxonomy').' where taxonomy = \'category\' AND term_id'.$inSqlStr;
+
+        $rs = DB::select( $sql ) ;
+        if( !$rs ){
+            return false ;
+        }else{
+            return $rs ;
+        }
+    }
+    
+
     
 }
