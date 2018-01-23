@@ -27,6 +27,12 @@ $router->group(['prefix' => config('app.api.rootname').'/'.config('app.version')
     
     //comments
     $router->get( 'comments' , 'WPAPICommentController@getCommentList' ) ;
+    
+     //homepage liuhongqiang 20180123
+    $router->get( 'home' , 'WPAPIHomeController@getHomeList' ) ;
+
+    //postList liuhongqiang 20180123
+    $router->get( 'posts' , 'WPAPIPostListController@getPostList' ) ;
 
 });
 //end add
