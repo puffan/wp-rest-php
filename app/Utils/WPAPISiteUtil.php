@@ -60,7 +60,7 @@ class WPAPISiteUtil{
                 $pathCurrentSiteTemp = '/'.$pathCurrentSiteTemp ;
             }
             if( substr( $pathCurrentSiteTemp , strlen( $pathCurrentSiteTemp ) -1 , 1 ) !== '/' ){  // not / end
-                $pathCurrentSiteTemp = $path_current_site_temp.'/' ;
+                $pathCurrentSiteTemp = $pathCurrentSiteTemp.'/' ;
             }
         }
         
