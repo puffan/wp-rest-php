@@ -39,5 +39,23 @@ class WPAPICategoryModel{
         }
     }
     
+     //added by liuhongqiang 20180123
+    public function getTaxonomyIds($categoryIds){
+        IF(!$categoryIds){
+            return false;
+        }
+
+        $inSqlStr = ' in( '.$categoryIds.' ) ' ;
+
+        $sql = 'SELECT term_taxonomy_id from '.WPAPISiteUtil::getSiteTableName('wp_%_term_taxonomy').' where taxonomy = \'category\' AND term_id'.$inSqlStr;
+
+        $rs = DB::select( $sql ) ;
+        if( !$rs ){
+            return false ;
+        }else{
+            return $rs ;
+        }
+    }
+    
     
 }
