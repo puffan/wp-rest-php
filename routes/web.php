@@ -21,10 +21,7 @@ $router->get('/', function () use ($router) {
 
 //add by chenyiwei on 20180120 21:45
 $router->group(['prefix' => config('app.api.rootname').'/'.config('app.version')] , function() use( $router ){
-    
-    $router->get( 'posts/{postId}' , 'WPAPIController@getPostDetail' ) ;
-    $router->get( 'siteid' , 'WPAPIController@getAllCategoriesByTenant' ) ;  //  {"api_version":"v1","result":2}
-    
+   
     //category 20180123
     $router->get( 'categories' , 'WPAPICategoryController@getCategoryList' ) ;
     

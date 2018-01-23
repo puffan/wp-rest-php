@@ -9,19 +9,12 @@ use Illuminate\Database\Query ;
  *
  */
 class WPAPIModel{
-   public function getPostDetail(){
-       $rs = DB::select( 'select post_content from wp_posts where id=22' ) ;
-       if( $rs ){
-           return $rs[0] ;
-       }
-   }
    
    //20180122
-   public function getSiteId(){
-       $aa = '/cms/welink/' ;
-       $rs = DB::select( 'select blog_id from wp_blogs where path in(\''.$aa.'\') limit 1 ;' ) ;
-       if( $rs ){
-           return $rs[0] ;
+   public function getSiteId( $sitePath ){
+       $rs = DB::select( 'select blog_id from wp_blogs where path in(\''.$sitePath.'\') limit 1 ;' ) ;
+       if( $rs && $rs[0] ){
+           return $rs[0]->blog_id ;
        }else{
            return false ;
        }

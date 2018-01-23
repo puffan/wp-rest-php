@@ -12,7 +12,7 @@ use App\Components\Response;
  * @author chenyiwei on 20180120
  *
  */
-class WPAPICommentController extends Controller{
+class WPAPICommentController extends WPAPIBaseController{
     
     const VALID_ORDER_VALUE = array( 'desc'=>'desc' , 'asc'=>'asc' ) ;
     const VALID_ORDER_DEFAULT = 'desc' ;
@@ -30,10 +30,6 @@ class WPAPICommentController extends Controller{
 
         $currentPageNum = empty( intval( $req->input( 'page' ) ) ) ? self::VALID_CURRENT_PAGE_NUM_DEFAULT : intval( $req->input( 'page' ) ) ;
         $perPage = empty( intval( $req->input( 'per_page' ) ) ) ? self::VALID_PER_PAGE_DEFAULT : intval( $req->input( 'per_page' ) ) ;
-        
-        //$offsetLimit =  $this->getOffsetLimit( $currentPageNum , $perPage ) ;
-        //$offset = $offsetLimit[ 'offset' ] ;
-        //$limit = $offsetLimit[ 'limit' ] ;
         
         $order = strtolower( trim( $req->input( 'order' ) ) ) ; 
         if( !array_key_exists( $order , self::VALID_ORDER_VALUE ) ) {
@@ -154,10 +150,10 @@ class WPAPICommentController extends Controller{
         
         4
      * 
-     * @param unknown $totalCount
-     * @param unknown $currentPageNum
-     * @param unknown $perPage
-     * @return unknown|number|string|unknown
+     * @param  $totalCount
+     * @param  $currentPageNum
+     * @param  $perPage
+     * @return |number|string|
      */
     private static function formatOffsetLimit( $totalCount , $currentPageNum , $perPage ){
    

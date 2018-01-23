@@ -12,7 +12,7 @@ use App\Models\WPAPIModel\WPAPICategoryModel;
  * @author chenyiwei on 20180123
  *
  */
-class WPAPICategoryController extends Controller{
+class WPAPICategoryController extends WPAPIBaseController{
     
     const VALID_TERMMETA_META_KEY_HIDE =   'hide_category' ;
     const VALID_TERMMETA_META_VALUE_FALSE = 'false' ;
