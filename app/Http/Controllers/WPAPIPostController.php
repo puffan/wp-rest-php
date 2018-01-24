@@ -18,15 +18,15 @@ class WPAPIPostController extends WPAPIBaseController{
     
     public function getPostDetail( Request $req , $postId ){
 
-        if( empty( $postId ) ){
-            Response::send( [] , 404 , 1 ) ;
+        if( !$postId ){
+            Response::sendError( Response::MSG_PARAMETER_ERROR.'postid is empty' ) ;
         }
         
         $postModel = new WPAPIPostModel() ;
         $singlePostObj = $postModel->getPostDetailById( $postId ) ;
         
         if( !$singlePostObj ){
-            Response::send( [] , 404 , 1 ) ;
+            Response::sendSuccess( (object)array() ) ;  //empty object {}
         }
         
         $singlePostObj = self::formatPostObjTags( $singlePostObj ) ;
@@ -35,7 +35,7 @@ class WPAPIPostController extends WPAPIBaseController{
         $singlePostObj = self::formatPostObjImgdata( $singlePostObj ) ;
         
         
-        Response::sendResult( $singlePostObj , 200 , 0 ) ;
+        Response::sendSuccess( $singlePostObj ) ;
     }
     
     private static function formatPostObjTags( $singlePostObj ){

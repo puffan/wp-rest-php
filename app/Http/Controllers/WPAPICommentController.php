@@ -17,6 +17,7 @@ class WPAPICommentController extends WPAPIBaseController{
     const VALID_ORDER_VALUE = array( 'desc'=>'desc' , 'asc'=>'asc' ) ;
     const VALID_ORDER_DEFAULT = 'desc' ;
     const VALID_PER_PAGE_DEFAULT  = 20 ;
+    const VALID_PER_PAGE_MAX  = 50 ;
     const VALID_CHILD_COMMENT_NUM_DEFAULT = 3 ;
     const VALID_CURRENT_PAGE_NUM_DEFAULT = 1 ;
     
@@ -24,12 +25,15 @@ class WPAPICommentController extends WPAPIBaseController{
     
     public function getCommentList( Request $req ){
         $postId = intval( $req->input( 'post' ) ) ; 
-        if( empty( $postId ) ){
-            Response::send( [] , 404 , 1 ) ;
+        if( !$postId  ){
+            Response::sendError( Response::MSG_PARAMETER_ERROR.'postid is empty' ) ;
         }
 
         $currentPageNum = empty( intval( $req->input( 'page' ) ) ) ? self::VALID_CURRENT_PAGE_NUM_DEFAULT : intval( $req->input( 'page' ) ) ;
         $perPage = empty( intval( $req->input( 'per_page' ) ) ) ? self::VALID_PER_PAGE_DEFAULT : intval( $req->input( 'per_page' ) ) ;
+        if( $perPage > self::VALID_PER_PAGE_MAX ){
+            $perPage = self::VALID_PER_PAGE_MAX ;
+        }
         
         $order = strtolower( trim( $req->input( 'order' ) ) ) ; 
         if( !array_key_exists( $order , self::VALID_ORDER_VALUE ) ) {
@@ -46,7 +50,7 @@ class WPAPICommentController extends WPAPIBaseController{
         $commentModel = new WPAPICommentModel() ;
         $parentCommentCountObj = $commentModel->getParentCommentCount( $postId ) ;
         if( !$parentCommentCountObj || !$parentCommentCountObj->parentCount ){
-            Response::sendError(500) ;
+            Response::sendSuccess( (object)array() ) ;  //empty object {}
         }
             
         $offsetLimitArr = self::formatOffsetLimit( $parentCommentCountObj->parentCount, $currentPageNum, $perPage ) ;
@@ -54,7 +58,7 @@ class WPAPICommentController extends WPAPIBaseController{
         $parentCommentObj = self::formatMultipleCommentObj( $parentCommentObj ) ;
         
         if( !$parentCommentObj ){
-            Response::sendError(500) ;
+            Response::sendSuccess( (object)array() ) ;  //empty object {} 
         }else{
             $dataObj = (object)array() ;
             $dataObj->parentCount = $parentCommentCountObj->parentCount ;
@@ -72,7 +76,7 @@ class WPAPICommentController extends WPAPIBaseController{
             }
             
             $dataObj->listData = $parentCommentObj ;
-            Response::sendResult( $dataObj , 200 , 0 ) ;
+            Response::sendSuccess( $dataObj ) ;
         }
     }
     
@@ -83,7 +87,7 @@ class WPAPICommentController extends WPAPIBaseController{
         $parentCommentSingleObj = $commentModel->getCommentById( $parentCommentId ) ;
         $parentCommentSingleObj = self::formatSingleCommentObj( $parentCommentSingleObj ) ;
         if( !$parentCommentSingleObj ){
-            Response::sendError(500) ;
+            Response::sendSuccess( (object)array() ) ;  //empty object {} 
         }else{
             $dataObj = (object)array() ;
             $dataObj->parentCount = 1 ;
@@ -101,7 +105,7 @@ class WPAPICommentController extends WPAPIBaseController{
             }
         
             $dataObj->listData = $parentCommentSingleObj ;
-            Response::sendResult( $dataObj , 200 , 0 ) ;
+            Response::sendSuccess( $dataObj ) ;
         }
     }
     
@@ -185,6 +189,10 @@ class WPAPICommentController extends WPAPIBaseController{
      */
     private static function formatOffsetLimit( $totalCount , $currentPageNum , $perPage ){
    
+        if( $perPage > self::VALID_PER_PAGE_MAX ){
+            $perPage = self::VALID_PER_PAGE_MAX ;
+        }
+        
         if( $perPage >= $totalCount ){  //only one page
             $resultArr[ 'offset' ] = 0 ;
             $resultArr[ 'limit' ] = $totalCount ; 

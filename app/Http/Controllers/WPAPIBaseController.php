@@ -14,7 +14,7 @@ class WPAPIBaseController extends Controller{
     
     public function __construct(){
         if( !WPAPISiteUtil::getSiteId() ){
-            Response::sendError(500) ;
+            Response::sendError( Response::MSG_SITE_NOT_FOUND ) ;
         }
     }
     

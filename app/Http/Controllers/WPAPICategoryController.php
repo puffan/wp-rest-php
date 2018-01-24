@@ -25,9 +25,9 @@ class WPAPICategoryController extends WPAPIBaseController{
         $categoryMultipleObj = $categoryModel->getCategoryList() ;
         $categoryMultipleObj = self::formatMultipleCategoryObj( $categoryMultipleObj ) ;
         if( !$categoryMultipleObj ){
-            Response::sendError(500) ;
+            Response::sendSuccess( [] ) ;
         }else{
-            Response::sendResult( $categoryMultipleObj , 200 , 0 ) ;
+            Response::sendSuccess( $categoryMultipleObj ) ;
         }
     }
     
