@@ -25,14 +25,17 @@ class WPAPIPostListController extends WPAPIBaseController
     public function __construct(){}
 
     public function getPostList( Request $req ){
-        $termId = intval( $req->input( 'categories' ) ) ;
+         $termId = intval( $req->input( 'categories' ) ) ;
         if( empty( $termId ) ){
-            Response::send( [] , 404 , 1 ) ;
+            Response::sendError( Response::MSG_PARAMETER_ERROR.'categoreis is empty' ) ;
         }
 
         $currentPageNum = empty( intval( $req->input( 'page' ) ) ) ? self::VALID_CURRENT_PAGE_NUM_DEFAULT : intval( $req->input( 'page' ) ) ;
         $perPage = empty( intval( $req->input( 'per_page' ) ) ) ? self::VALID_PER_PAGE_DEFAULT : intval( $req->input( 'per_page' ) ) ;
 
+        if( $perPage > self::VALID_PER_PAGE_MAX ){
+            $perPage = self::VALID_PER_PAGE_MAX ;
+        }
         $order = strtolower( trim( $req->input( 'order' ) ) ) ;
 
         if( !array_key_exists( $order , self::VALID_ORDER_VALUE ) ) {
@@ -43,7 +46,7 @@ class WPAPIPostListController extends WPAPIBaseController
         $limit = $perPage;
         $term_taxonomy_obj = $categoryModel->getTaxonomyIds($termId);
         if(empty($term_taxonomy_obj)){
-            Response::send( [] , 404 , 1 ) ;
+            Response::sendSuccess( array() ) ;
         }
         $term_taxonomy_id = $term_taxonomy_obj[0]->term_taxonomy_id;
         $postModel = new WPAPIModel();
@@ -52,8 +55,7 @@ class WPAPIPostListController extends WPAPIBaseController
 
         $dataJsonArr = self::getDataJsonArr($postList);
 
-        Response::sendResult( $dataJsonArr , 200 , 0 ) ;
-
+        Response::sendSuccess( $dataJsonArr ) ;
 
     }
 
