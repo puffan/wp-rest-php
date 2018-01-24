@@ -25,12 +25,14 @@ $app = new Laravel\Lumen\Application(
 
 //add by chenyiwei on 20180120 21:38
 require_once __DIR__.'/config.php';
+$app->register( Illuminate\Redis\RedisServiceProvider::class ) ;
 //end
 
 //open facades by chenyiwei on 20180121
 $app->withFacades();
 
-// $app->withEloquent();
+//open eloquent to use redis by chenyiwei on 20180124
+$app->withEloquent();
 
 /*
 |--------------------------------------------------------------------------

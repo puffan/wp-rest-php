@@ -3,15 +3,19 @@
 namespace App\Utils ;
 
 use App\Models\WPAPIModel\WPAPIModel;
+use Cache ;
 
 class WPAPISiteUtil{
     
     const VALID_TENANTID_DEFAULT = '' ;
     const VALID_SITEID_DEFAULT = 1 ;
     
+    const VALID_REDIS_EXPIRE_MINUTES_DEFAULT = 1440 ;  //1440 minutes = 24 hours
+    
     protected static $siteId = 0 ;
     
     public function __construct(){}
+    
     
     /**
      *
@@ -35,14 +39,52 @@ class WPAPISiteUtil{
         }
         $sitePath = self::getSitePath() ;
         $wpapiModel = new WPAPIModel() ;
-        $siteId = $wpapiModel->getSiteId( $sitePath ) ;
+        
+        //getSiteId from redis 20180124
+        $siteId = self::getSiteIdCache( $sitePath ) ;
         if( !$siteId ){
-            return false ;
+            $siteId = $wpapiModel->getSiteId( $sitePath ) ;
+            if( !$siteId ){
+                return false ;
+            }else{
+                self::setSiteIdCache( $sitePath , $siteId ) ;
+                self::$siteId = $siteId ;
+                return self::$siteId ;
+            }
         }else{
             self::$siteId = $siteId ;
             return self::$siteId ;
         }
+        //end
+        
     }
+       
+    //getSiteId from redis 20180124
+    private static function getSiteIdCache( $sitePath ){
+        if( !WPAPIRedisUtil::isRedisOK() ){
+            return false ;
+        }
+        $siteRKey = 'site_id_'.$sitePath ;
+        $siteRValue = Cache::get( $siteRKey ) ;
+        if( !$siteRValue ){
+            return false ;
+        }else{
+            return $siteRValue ;
+        }
+    }
+    
+    private static function setSiteIdCache( $sitePath , $siteId ){
+        if( !WPAPIRedisUtil::isRedisOK() ){
+            return false ;
+        }
+        $siteRKey = 'site_id_'.$sitePath ;
+        $expireMinutes = self::VALID_REDIS_EXPIRE_MINUTES_DEFAULT ;
+        if( intval( config( 'cache.default.time' ) ) ){
+            $expireMinutes = intval( config( 'cache.default.time' ) ) ;
+        }
+        Cache::put( $siteRKey , $siteId , $expireMinutes  ) ;
+    }
+    
     
     private static function getSitePath(){
         
