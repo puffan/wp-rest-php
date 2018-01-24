@@ -28,6 +28,9 @@ class WPAPIHomeController extends Controller
         $categoryModel = new WPAPICategoryModel() ;
         $categoryMultipleObj = $categoryModel->getCategoryList() ;
         $categoryMultipleObj = self::formatMultipleCategoryObj( $categoryMultipleObj ) ;
+        if( !$categoryMultipleObj ){
+            Response::sendSuccess( array() ) ;
+        }
         $categoryIds = self::getCategoryIds($categoryMultipleObj);
         $term_taxonomy_ids = $categoryModel->getTaxonomyIds($categoryIds);
 
@@ -36,10 +39,10 @@ class WPAPIHomeController extends Controller
 
         $dataJsonArr = self::getDataJsonArr($categoryMultipleObj,$postList);
 
-        if( !$categoryMultipleObj ){
-            Response::sendError(500) ;
+        if(!$dataJsonArr){
+            Response::sendSuccess( array() ) ;
         }else{
-            Response::sendResult( $dataJsonArr , 200 , 0 ) ;
+            Response::sendSuccess( $dataJsonArr , 200 , 0 ) ;
         }
     }
 
