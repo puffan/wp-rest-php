@@ -16,6 +16,10 @@ use App\Models\WPAPIModel\WPAPICategoryModel;
  */
 class WPAPIPostController extends WPAPIBaseController{
     
+    public function __construct(){
+        parent::__construct() ;
+    }
+    
     public function getPostDetail( Request $req , $postId ){
 
         if( !$postId ){

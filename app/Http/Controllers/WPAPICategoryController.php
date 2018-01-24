@@ -18,7 +18,9 @@ class WPAPICategoryController extends WPAPIBaseController{
     const VALID_TERMMETA_META_VALUE_FALSE = 'false' ;
     const VALID_TERMMETA_META_VALUE_YES = 'yes' ;
     
-    public function __construct(){}
+    public function __construct(){
+        parent::__construct() ;  
+    }
     
     public function getCategoryList( Request $req ){
         $categoryModel = new WPAPICategoryModel() ;

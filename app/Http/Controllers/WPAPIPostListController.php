@@ -22,7 +22,9 @@ class WPAPIPostListController extends WPAPIBaseController
     const VALID_PER_PAGE_DEFAULT  = 10 ;
     const VALID_CURRENT_PAGE_NUM_DEFAULT = 1 ;
 
-    public function __construct(){}
+    public function __construct(){
+        parent::__construct() ;
+    }
 
     public function getPostList( Request $req ){
          $termId = intval( $req->input( 'categories' ) ) ;

@@ -22,7 +22,9 @@ class WPAPIHomeController extends Controller
     const VALID_TERMMETA_META_VALUE_FALSE = 'false' ;
     const VALID_TERMMETA_META_VALUE_YES = 'yes' ;
 
-    public function __construct(){}
+    public function __construct(){
+        parent::__construct() ;
+    }
 
     public function getHomeList( Request $req ){
         $categoryModel = new WPAPICategoryModel() ;

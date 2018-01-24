@@ -22,6 +22,7 @@ class WPAPICommentController extends WPAPIBaseController{
     const VALID_CURRENT_PAGE_NUM_DEFAULT = 1 ;
     
     public function __construct(){
+        parent::__construct() ;
     }
     
     public function getCommentList( Request $req ){
