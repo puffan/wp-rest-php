@@ -11,6 +11,7 @@ namespace App\Http\Controllers;
 use App\Models\WPAPIModel\WPAPIModel;
 use Illuminate\Http\Request;
 use App\Components\Response;
+use App\Utils\WPAPIUserUtil;
 use App\Models\WPAPIModel\WPAPICategoryModel;
 
 
@@ -61,10 +62,11 @@ class WPAPIHomeController extends Controller
     private static function formatListData($postListObj){
         $listDataArr = array();
         $postModel = new WPAPIModel();
+        $userUtil = new WPAPIUserUtil();
        foreach ($postListObj as $key=> $value){
            $listDataArr[$key]['createTime'] = $value->post_date;
            $listDataArr[$key]['imgData'] = $postModel->getPostImgData($value->ID);
-           $listDataArr[$key]['nameCn'] = $value->post_author;
+           $listDataArr[$key]['nameCn'] = $userUtil->getWPSingleUserById($value->post_author)->user_login;
            $listDataArr[$key]['id'] = $value->ID;
            $listDataArr[$key]['title'] = $value->post_title;
        }
