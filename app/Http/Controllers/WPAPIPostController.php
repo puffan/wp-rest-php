@@ -27,12 +27,9 @@ class WPAPIPostController extends WPAPIBaseController{
         $wpAPIPostCache = new WPAPIPostCache() ;
         $singlePostObj = $wpAPIPostCache->getPostDetail($postId) ;
         if( !$singlePostObj ){
-            Response::sendError( Response::MSG_PARAMETER_ERROR.'this post not found,posid='.$postId ) ;
-        }
-        
-        /*if( !$singlePostObj ){
+            //Response::sendError( Response::MSG_PARAMETER_ERROR.'this post not found,posid='.$postId ) ;
             Response::sendSuccess( (object)array() ) ;  //empty object {}
-        }*/
+        }
         
         WPAPIPostFilter::formatSinglePostObjByRules($singlePostObj, WPAPIPostFilter::COMMON_RULES_UNSET_GZUNCOMPRESS ) ;
         
