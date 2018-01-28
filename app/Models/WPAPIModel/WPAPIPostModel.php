@@ -14,7 +14,8 @@ class WPAPIPostModel{
     public function getPostDetailById( $postId ){
         $postId = intval( $postId ) ;
         $sql = 'select ID as id, post_content as content, post_author as author, comment_status, 0 as categories, \'\' as tags, '. 
-           'post_title as welink_title, post_date as welink_createTime, \'\' as welink_nameCn, \'\' as welink_imgData, \'\' as welink_accountid '.
+           'post_title as welink_title, post_date as welink_createTime, \'\' as welink_nameCn, \'\' as welink_imgData, \'\' as welink_accountid, '.
+           'comment_count '.
            'from '.WPAPISiteUtil::getSiteTableName('wp_%_posts').' where ID='.$postId.' limit 1; ' ;
         $rs = DB::select( $sql ) ;
         if( !$rs || !$rs[0] ){

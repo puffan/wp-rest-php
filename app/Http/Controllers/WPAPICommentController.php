@@ -4,8 +4,12 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\Models\WPAPIModel\WPAPICommentModel;
+use App\Cache\WPAPICache\WPAPICommentCache;
+use App\Cache\WPAPICache\WPAPIPostCache;
 use App\Components\Response;
-use App\Utils\WPAPIUserUtil ;
+use App\Utils\PageUtil ;
+use App\Utils\Filters\WPAPICommentFilter ;
+
 
 /**
  *
@@ -43,21 +47,51 @@ class WPAPICommentController extends WPAPIBaseController{
         }
 
         $parentCommentId = intval( $req->input( 'parent' ) ) ;
-        //Get child comment list
-        if( $parentCommentId ){
-            return $this->getChildCommentList( $parentCommentId , $postId , $currentPageNum , $perPage , $order ) ;
-        }
-        //end get chilid comment list
         
+        $wpAPIPostCache = new WPAPIPostCache() ;
+        $postDetail = $wpAPIPostCache->getPostDetail($postId) ;
+        if( !$postDetail ){
+            Response::sendError( Response::MSG_PARAMETER_ERROR.'this post not found,posid='.$postId ) ;
+        }
+        
+        $wpAPICommentCache = new WPAPICommentCache() ;
+        $isCommentCanCache = $wpAPICommentCache->isCanLoadAllCommentToCache( $postId ) ;
+       
+        //get child comment list
+        if( $parentCommentId ){
+            if( $isCommentCanCache ){  //get child comment from cache
+                $dataObj = $wpAPICommentCache->getChildCommentList( $parentCommentId , $postId , $currentPageNum , $perPage , $order ) ;
+                if( !$dataObj ){
+                    Response::sendSuccess( (object)array() ) ;  //empty object {}
+                }else{
+                    Response::sendSuccess( $dataObj ) ;
+                }   
+            }else{  //get child comment from database
+               return $this->getChildCommentList( $parentCommentId , $postId , $currentPageNum , $perPage , $order ) ;
+            }
+        }
+        //end and return get chilid comment list
+        
+        //get parent comment from cache and return 
+        if( $isCommentCanCache ){
+            $dataObj = $wpAPICommentCache->getParentCommentList($postId, $currentPageNum , $perPage , $order) ;
+            if( !$dataObj ){
+                Response::sendSuccess( (object)array() ) ;  //empty object {}
+            }else{
+                Response::sendSuccess( $dataObj ) ;
+            }    
+        }
+        
+        //get parent comment from database and return 
         $commentModel = new WPAPICommentModel() ;
         $parentCommentCountObj = $commentModel->getParentCommentCount( $postId ) ;
         if( !$parentCommentCountObj || !$parentCommentCountObj->parentCount ){
             Response::sendSuccess( (object)array() ) ;  //empty object {}
         }
             
-        $offsetLimitArr = self::formatOffsetLimit( $parentCommentCountObj->parentCount, $currentPageNum, $perPage ) ;
+        $offsetLimitArr = PageUtil::formatOffsetLimit( $parentCommentCountObj->parentCount, $currentPageNum, $perPage ) ;
         $parentCommentObj = $commentModel->getParentCommentList( $postId , $offsetLimitArr['offset'] , $offsetLimitArr['limit'] , $order) ;
-        $parentCommentObj = self::formatMultipleCommentObj( $parentCommentObj ) ;
+        $parentCommentObj = WPAPICommentFilter::formatMultipleCommentObjByRules( $parentCommentObj , WPAPICommentFilter::COMMON_RULES_DEFAULT_NO_GZ ) ;
         
         if( !$parentCommentObj ){
             Response::sendSuccess( (object)array() ) ;  //empty object {} 
@@ -67,7 +101,7 @@ class WPAPICommentController extends WPAPIBaseController{
 
             foreach( $parentCommentObj as $key=>$value ){
                 $childCommentObj      = $commentModel->getChildCommentList( $value->id , $postId , 0 , self::VALID_CHILD_COMMENT_NUM_DEFAULT , self::VALID_ORDER_DEFAULT ) ;
-                $childCommentObj = self::formatMultipleCommentObj( $childCommentObj ) ;
+                $childCommentObj = WPAPICommentFilter::formatMultipleCommentObjByRules( $childCommentObj , WPAPICommentFilter::COMMON_RULES_DEFAULT_NO_GZ ) ;
                 $childCommentCountObj = $commentModel->getChildCommentCount( $value->id , $postId ) ;
                 $parentCommentObj[$key]->childCount = $childCommentCountObj->childCount ;
                 if( $childCommentObj ){
@@ -87,7 +121,7 @@ class WPAPICommentController extends WPAPIBaseController{
     public function getChildCommentList( $parentCommentId , $postId , $currentPageNum , $perPage , $order ){
         $commentModel = new WPAPICommentModel() ;
         $parentCommentSingleObj = $commentModel->getCommentById( $parentCommentId ) ;
-        $parentCommentSingleObj = self::formatSingleCommentObj( $parentCommentSingleObj ) ;
+        $parentCommentSingleObj = WPAPICommentFilter::formatSingleCommentObjByRules( $parentCommentSingleObj , WPAPICommentFilter::COMMON_RULES_DEFAULT_NO_GZ ) ;
         if( !$parentCommentSingleObj ){
             Response::sendSuccess( (object)array() ) ;  //empty object {} 
         }else{
@@ -99,9 +133,9 @@ class WPAPICommentController extends WPAPIBaseController{
                 $parentCommentSingleObj->childCount = 0 ;
                 $parentCommentSingleObj->child = array() ;
             }else{
-                $offsetLimitArr = self::formatOffsetLimit( $childCommentCountObj->childCount, $currentPageNum, $perPage ) ;
+                $offsetLimitArr = PageUtil::formatOffsetLimit( $childCommentCountObj->childCount, $currentPageNum, $perPage ) ;
                 $childCommentObj = $commentModel->getChildCommentList( $parentCommentId , $postId , $offsetLimitArr['offset'] , $offsetLimitArr['limit'] , $order) ;
-                $childCommentObj = self::formatMultipleCommentObj( $childCommentObj ) ;
+                $childCommentObj = WPAPICommentFilter::formatMultipleCommentObjByRules( $childCommentObj , WPAPICommentFilter::COMMON_RULES_DEFAULT_NO_GZ ) ;
                 $parentCommentSingleObj->childCount = $childCommentCountObj->childCount ;
                 $parentCommentSingleObj->child = $childCommentObj ;
             }
@@ -111,120 +145,6 @@ class WPAPICommentController extends WPAPIBaseController{
         }
     }
     
-    
-    private static function formatSingleCommentObj( $singleCommentObj ){
-        if( !$singleCommentObj ){
-            return  $singleCommentObj ;
-        }
-        
-        $singleCommentObj = self::formatCommentObjStatus( $singleCommentObj ) ; 
-        $singleCommentObj = self::formatCommentObjUser( $singleCommentObj )  ; 
-        $singleCommentObj = self::formatCommentObjParent( $singleCommentObj )  ;
-        
-        return $singleCommentObj ;
-    }
-    
-    private static function formatMultipleCommentObj( $mutipleCommentObj ){
-        if( !$mutipleCommentObj ){
-            return $mutipleCommentObj ;
-        }   
-        $resultArr = array() ;
-        foreach ( $mutipleCommentObj as $key=> $value ){
-            $resultArr[$key] = self::formatSingleCommentObj( $value ) ;
-        }
-        return $resultArr ;
-    }
-        
-    
-    private static function formatCommentObjStatus( $singleCommentObj ){
-        if( !$singleCommentObj ){
-            return $singleCommentObj ;
-        }
-        
-        if( $singleCommentObj->status == 1 ){
-            $singleCommentObj->status = 'approved' ;
-        }
-        
-        return $singleCommentObj ;
-    }
-    
-    private static function formatCommentObjParent( $singleCommentObj ){
-        if( !$singleCommentObj ){
-            return $singleCommentObj ;
-        }
-        
-        $singleCommentObj->parent = 0 ;     
-        return $singleCommentObj ;
-    }
-    
-    private static function formatCommentObjUser( $singleCommentObj ){
-        $wpSingleUserMeta = WPAPIUserUtil::getWPSingleUserMetaById( $singleCommentObj->author ) ;
-        if( !$wpSingleUserMeta || !$wpSingleUserMeta->meta_value ){
-            $singleCommentObj->accountid = '' ; // not find accountid , set accountid to emtpy
-            return $singleCommentObj ;
-        }else{
-            $singleCommentObj->accountid = $wpSingleUserMeta->meta_value ;
-            return $singleCommentObj ;
-        }
-    }
-    
-    
-    /**
-     *
-     * 
-        Example:
-        
-        5/2  = 2 ( pages=2+1=3)
-        
-        0
-        1
-        
-        2
-        3
-        
-        4
-     * 
-     * @param  $totalCount
-     * @param  $currentPageNum
-     * @param  $perPage
-     * @return |number|string|
-     */
-    private static function formatOffsetLimit( $totalCount , $currentPageNum , $perPage ){
    
-        if( $perPage > self::VALID_PER_PAGE_MAX ){
-            $perPage = self::VALID_PER_PAGE_MAX ;
-        }
-        
-        if( $perPage >= $totalCount ){  //only one page
-            $resultArr[ 'offset' ] = 0 ;
-            $resultArr[ 'limit' ] = $totalCount ; 
-            return $resultArr ;
-        }
-        
-        $offset = 0 ;
-        $limit = self::VALID_PER_PAGE_DEFAULT ;
-        
-        if( $totalCount%$perPage == 0 ){ //
-            $totalPages = $totalCount/$perPage ;
-        }else{
-            $totalPages =  $totalCount/$perPage + 1 ;
-        }
-        
-        if( $currentPageNum == $totalPages ){  //the last page
-            $offset = ( $currentPageNum - 1 ) * $perPage ;
-            $limit = $totalCount - ( $currentPageNum - 1 ) * $perPage ;
-        }else{   //not the last page
-            $offset = ( $currentPageNum - 1 ) * $perPage ;
-            $limit = $perPage ;
-        }
-        
-        $resultArr[ 'offset' ] = $offset ;
-        $resultArr[ 'limit' ] = $limit ; 
-        
-        return $resultArr ;
-         
-    }
-    
-    
     
 }
