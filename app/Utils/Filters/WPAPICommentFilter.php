@@ -34,10 +34,6 @@ class WPAPICommentFilter{
             $singleCommentObj = self::$funcName( $singleCommentObj ) ;
         }
         
-        //$singleCommentObj = self::formatCommentObjStatus( $singleCommentObj ) ;
-        //$singleCommentObj = self::formatCommentObjUser( $singleCommentObj )  ;
-        //$singleCommentObj = self::formatCommentObjParent( $singleCommentObj )  ;
-       
         return $singleCommentObj ;
     }
     
@@ -91,7 +87,16 @@ class WPAPICommentFilter{
     }
     
     private static function formatCommentObjContentGzuncompress( $singleCommentObj ){   // compress content
-        $singleCommentObj->content = gzuncompress ( $singleCommentObj->content ) ;
+        
+        $temp = $singleCommentObj->content ;
+        try{
+            $temp = gzuncompress ( $singleCommentObj->content ) ;
+        }catch( \Exception $e ){
+            $temp = $singleCommentObj->content ;
+        }
+        
+        $singleCommentObj->content = $temp ;
+        
         return $singleCommentObj ;
     }
     

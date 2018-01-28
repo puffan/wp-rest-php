@@ -3,6 +3,7 @@ namespace App\Cache\WPAPICache ;
 
 use App\Models\WPAPIModel\WPAPIPostModel;
 use Cache;
+use App\Utils\Filters\WPAPIPostFilter;
 
 class WPAPIPostCache{
     
@@ -47,6 +48,7 @@ class WPAPIPostCache{
         if( !$postDetail ){
             return false ;
         }else{
+            $postDetail = WPAPIPostFilter::formatSinglePostObjByRules( $postDetail , WPAPIPostFilter::COMMON_RULES_DEFAULT_AND_GZ ) ;
             $this->setPostDetailCache($postId, $postDetail) ;
             return $postDetail ;
         }
