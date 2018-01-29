@@ -30,7 +30,11 @@ class WPAPIPostFilter{
         
         foreach( $ruleArr as $key=>$value ){
             $funcName = self::FORMAT_FUNC_STR.$value ;  //formatCommentObjStatus
-            $singlePostObj = self::$funcName( $singlePostObj ) ;
+            if( config( 'content.gzcompress' ) == 'off' &&  $value == self::RULE_GZCOMPRESS ) {
+                //do nothing
+            }else{
+                $singlePostObj = self::$funcName( $singlePostObj ) ;
+            }
         }
         
         return $singlePostObj ;

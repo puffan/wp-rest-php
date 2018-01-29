@@ -31,7 +31,11 @@ class WPAPICommentFilter{
         
         foreach( $ruleArr as $key=>$value ){
             $funcName = self::FORMAT_FUNC_STR.$value ;  //formatCommentObjStatus
-            $singleCommentObj = self::$funcName( $singleCommentObj ) ;
+            if( ( config( 'content.gzcompress' ) == 'off' &&  $value == self::RULE_GZCOMPRESS ) ||  $value == self::RULE_PARENT ) {
+                //do nothing
+            }else{
+                $singleCommentObj = self::$funcName( $singleCommentObj ) ;
+            }
         }
         
         return $singleCommentObj ;
