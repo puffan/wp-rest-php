@@ -73,7 +73,7 @@ class WPAPICommentCache{
         //end foreach
         
         $this->setAllCommentListCache( $postId , $rstArr ) ;
-        
+        return $rstArr ;
     }
     
     
