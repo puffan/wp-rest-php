@@ -45,28 +45,35 @@ class WPAPICommentCache{
         foreach( $allCommentList as $key=>$value ){  //order : desc
             $valueClone = clone $value ;
             if( $valueClone->parent == 0 ){   // parent comment
+                $arrTemp = array() ;
                 $rstK = $valueClone->id ;
                 $arrTemp[0] = WPAPICommentFilter::formatSingleCommentObjByRules( $value , WPAPICommentFilter::COMMON_RULES_DEFAULT_AND_GZ )  ;                    // $arrTemp[0] = parent comment
                 if( isset(  $rstArr[$rstK] ) && isset( $rstArr[$rstK][1] ) ){                            // $arrTemp[1] = childCommentListArr
                     $arrTemp[1] = $rstArr[$rstK][1] ;
                 }
                 $rstArr[$rstK] = $arrTemp ;
+                unset( $arrTemp ) ;
             }else{   //child comment
                 $rstK = $valueClone->parent ;
                 if( !isset( $rstArr[$rstK] ) ) {  //child comment appear first , parent not appear yet
+                    $arrTemp = array() ;
                     $arrTemp[0] = (object)array()  ;  //parent object place there first
                     $childArrTemp[0] = WPAPICommentFilter::formatSingleCommentObjByRules( $value , WPAPICommentFilter::COMMON_RULES_DEFAULT_AND_GZ )    ;
                     $arrTemp[1] =  $childArrTemp ;
                     $rstArr[$rstK] = $arrTemp ;
+                    unset( $arrTemp ) ;
                 }else if( !isset(  $rstArr[$rstK][1] ) ){ // parent already appear , first child appear
                     $childArrTemp = array() ;
                     $childArrTemp[0] = WPAPICommentFilter::formatSingleCommentObjByRules( $value , WPAPICommentFilter::COMMON_RULES_DEFAULT_AND_GZ ) ;
                     $rstArr[$rstK][1] = $childArrTemp ;
+                    unset( $childArrTemp ) ;
                 }else{                                             //parent appear , and second , third... child appear
+                    $childArrTemp = array() ;
                     $childArrTemp = $rstArr[$rstK][1] ;
                     $size = sizeof( $childArrTemp ) ;
                     $childArrTemp[ $size ] = WPAPICommentFilter::formatSingleCommentObjByRules( $value , WPAPICommentFilter::COMMON_RULES_DEFAULT_AND_GZ ) ;
                     $rstArr[$rstK][1] = $childArrTemp ;
+                    unset( $childArrTemp ) ;
                 }
             }
         }
