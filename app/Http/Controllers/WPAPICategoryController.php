@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
+use App\Cache\WPAPICache\WPAPICategoryCache;
 use App\Components\Response;
 use App\Models\WPAPIModel\WPAPICategoryModel;
 use App\Utils\Filters\WPAPICategoryFilter ;
@@ -19,13 +20,13 @@ class WPAPICategoryController extends WPAPIBaseController{
     }
     
     public function getCategoryList( Request $req ){
-        $categoryModel = new WPAPICategoryModel() ;
-        $categoryMultipleObj = $categoryModel->getCategoryList() ;
-        $categoryMultipleObj = WPAPICategoryFilter::formatMultipleCategoryObjByRules( $categoryMultipleObj , WPAPICategoryFilter::COMMON_RULES_DEFAULT ) ;
-        if( !$categoryMultipleObj ){
+        $categoryListCache = new WPAPICategoryCache() ;
+        $categoryMultipleObjCache = $categoryListCache->getCategoryList() ;
+        $categoryMultipleObjCache = WPAPICategoryFilter::formatMultipleCategoryObjByRules( $categoryMultipleObjCache , WPAPICategoryFilter::COMMON_RULES_DEFAULT ) ;
+        if( !$categoryMultipleObjCache ){
             Response::sendSuccess( [] ) ;
         }else{
-            Response::sendSuccess( $categoryMultipleObj ) ;
+            Response::sendSuccess( $categoryMultipleObjCache ) ;
         }
     }
     

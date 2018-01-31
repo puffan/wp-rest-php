@@ -3,6 +3,7 @@ namespace App\Cache\WPAPICache ;
 
 use App\Models\WPAPIModel\WPAPIPostModel;
 use Cache;
+use App\Utils\WPAPISiteUtil;
 use App\Utils\Filters\WPAPIPostFilter;
 
 class WPAPIPostCache{
@@ -24,7 +25,7 @@ class WPAPIPostCache{
     }
     
     private function setPostDetailCache( $postId , $postDetail ){
-        $rKeyPostDetail = self::rKeyPostDetail.$postId ;
+        $rKeyPostDetail = WPAPISiteUtil::getWPAPICacheRedisKeyCommonPrefix().self::rKeyPostDetail.$postId ;
         $expireMinutes = self::VALID_REDIS_EXPIRE_MINUTES_DEFAULT ;
         if( intval( config( 'cache.default.time' ) ) ){
             $expireMinutes = intval( config( 'cache.default.time' ) ) ;
@@ -34,7 +35,7 @@ class WPAPIPostCache{
     
     
     private function getPostDetailCache( $postId ){
-        $rKeyPostDetail = self::rKeyPostDetail.$postId ;
+        $rKeyPostDetail = WPAPISiteUtil::getWPAPICacheRedisKeyCommonPrefix().self::rKeyPostDetail.$postId ;
         $postDetail = Cache::get( $rKeyPostDetail ) ;
         if( !$postDetail ){
             return false ;
@@ -74,7 +75,7 @@ class WPAPIPostCache{
     
     
     private function setCommentCountCache( $postId , $commentCount ){
-        $rKeyCommentCount = self::rKeyCommentCount.$postId ;
+        $rKeyCommentCount = WPAPISiteUtil::getWPAPICacheRedisKeyCommonPrefix().self::rKeyCommentCount.$postId ;
         $expireMinutes = self::VALID_REDIS_EXPIRE_MINUTES_DEFAULT ;
         if( intval( config( 'cache.default.time' ) ) ){
             $expireMinutes = intval( config( 'cache.default.time' ) ) ;
@@ -84,7 +85,7 @@ class WPAPIPostCache{
     
     
     private function getCommentCountCache( $postId ){
-        $rKeyCommentCount = self::rKeyCommentCount.$postId ;
+        $rKeyCommentCount = WPAPISiteUtil::getWPAPICacheRedisKeyCommonPrefix().self::rKeyCommentCount.$postId ;
         $commentCount = Cache::get( $rKeyCommentCount ) ;
         if( 0 === $commentCount ){
             return 0 ;

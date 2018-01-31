@@ -7,6 +7,7 @@ use Cache ;
 
 class WPAPISiteUtil{
     
+    const RKEY_SITE_ID_PREFIX = 'sid_' ;
     const VALID_TENANTID_DEFAULT = '' ;
     const VALID_SITEID_DEFAULT = 1 ;
     
@@ -57,6 +58,10 @@ class WPAPISiteUtil{
         }
         //end
         
+    }
+    
+    public static function getWPAPICacheRedisKeyCommonPrefix(){
+        return self::RKEY_SITE_ID_PREFIX.self::$siteId.'_' ;
     }
        
     //getSiteId from redis 20180124
