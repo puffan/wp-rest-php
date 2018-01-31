@@ -7,7 +7,7 @@ use App\Utils\PageUtil;
 
 class WPAPICommentCache{
     
-    const rKeyAllCommentList = 'all_comment_list_' ;
+    const rKeyAllCommentList = 'comment_list_' ;
     const VALID_ORDER_DEFAULT = 'desc' ;
     const VALID_REDIS_EXPIRE_MINUTES_DEFAULT = 1440 ;  //1440 minutes = 24 hours
     const VALID_CAN_LOAD_TO_CACHE_LIMIT = 1000 ;  //
@@ -104,7 +104,12 @@ class WPAPICommentCache{
         if( !$rstArr ){
             $rstArr = $this->initAllCommentListToCache( $postId ) ;
         }
+        if( !$rstArr || sizeof( $rstArr ) == 0 ){
+            return false ;
+        }
+        
         //fort parent list what to be want
+        
         $isOrderDefault = true ;
         if( strtolower( $order ) != self::VALID_ORDER_DEFAULT ){
             $allCommentList = array_reverse( $allCommentList ) ;  //reverse array
@@ -212,16 +217,11 @@ class WPAPICommentCache{
     public function isCanLoadAllCommentToCache( $postId ){
         $commentCount = 0 ;
         $wpAPIPostCache = new WPAPIPostCache() ;
-        $postDetailObj = $wpAPIPostCache->getPostDetail($postId) ;
-        if( !$postDetailObj ){
+        $commentCount = $wpAPIPostCache->getCommentCount($postId) ;
+        if( $commentCount > self::VALID_CAN_LOAD_TO_CACHE_LIMIT ){
             return false ;
         }else{
-            $commentCount = intval( $postDetailObj->comment_count ) ;
-            if( $commentCount > self::VALID_CAN_LOAD_TO_CACHE_LIMIT ){
-                return false ;
-            }else{
-                return true ;
-            }
+            return true ;
         }
     }
     

@@ -12,4 +12,5 @@ config([
    'cache.default.time'=>'1440',  //redis default cache time , minutes , 1440 minutes = 24 hours
    'static.version'=>'11',
    'PATH_CURRENT_SITE' => '/cms/' ,
+   'content.gzcompress' => 'off' ,   //on: gzcompress ,  off:not gzcompress
 ]);

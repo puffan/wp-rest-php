@@ -8,6 +8,7 @@ use App\Utils\Filters\WPAPIPostFilter;
 class WPAPIPostCache{
     
     const rKeyPostDetail = 'post_detail_' ;
+    const rKeyCommentCount = 'comment_count_' ;
     const VALID_REDIS_EXPIRE_MINUTES_DEFAULT = 1440 ;
     
     public function getPostDetail( $postId ){
@@ -53,5 +54,67 @@ class WPAPIPostCache{
             return $postDetail ;
         }
     }
+    
+    
+    
+    
+    
+    public function getCommentCount( $postId ){
+        $commentCount = $this->getCommentCountCache($postId) ;
+        if( !$commentCount && 0 !== $commentCount ){
+            $commentCount = $this->initCommentCountToCache($postId) ;
+        }
+        
+        $commentCount = intval( $commentCount ) ;
+        if( $commentCount < 0 ){
+            $commentCount = 0 ;
+        }
+        return $commentCount ;
+    }
+    
+    
+    private function setCommentCountCache( $postId , $commentCount ){
+        $rKeyCommentCount = self::rKeyCommentCount.$postId ;
+        $expireMinutes = self::VALID_REDIS_EXPIRE_MINUTES_DEFAULT ;
+        if( intval( config( 'cache.default.time' ) ) ){
+            $expireMinutes = intval( config( 'cache.default.time' ) ) ;
+        }
+        Cache::put( $rKeyCommentCount , $commentCount , $expireMinutes  ) ;
+    }
+    
+    
+    private function getCommentCountCache( $postId ){
+        $rKeyCommentCount = self::rKeyCommentCount.$postId ;
+        $commentCount = Cache::get( $rKeyCommentCount ) ;
+        if( 0 === $commentCount ){
+            return 0 ;
+        }else if( !$commentCount ){
+            return false ;
+        }else{
+            return intval( $commentCount ) ;
+        }
+    }
+    
+    
+    /**
+     * Always init 0 value of comment_count to redis cache
+     * 
+     * @param unknown $postId
+     * @return number|unknown
+     */
+    private function initCommentCountToCache( $postId ){
+        $commentCount = 0 ;
+        $wpAPIPostModel = new WPAPIPostModel() ;
+        $postCommentCountObj = $wpAPIPostModel->getCommentCountByPostId($postId) ;
+        if( !$postCommentCountObj ){
+            $commentCount = 0 ; 
+        }else{
+            $commentCount = intval( $postCommentCountObj->comment_count ) ;// 
+        }
+        
+        $this->setCommentCountCache($postId, $commentCount) ;
+        return $commentCount ;
+    }
+    
     
 }
