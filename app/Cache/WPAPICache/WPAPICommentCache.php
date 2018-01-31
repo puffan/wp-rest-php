@@ -52,6 +52,7 @@ class WPAPICommentCache{
                 if( isset(  $rstArr[$rstK] ) && isset( $rstArr[$rstK][1] ) ){                            // $arrTemp[1] = childCommentListArr
                     $arrTemp[1] = $rstArr[$rstK][1] ;
                 }
+                unset( $rstArr[$rstK] ) ;
                 $rstArr[$rstK] = $arrTemp ;
                 unset( $arrTemp ) ;
             }else{   //child comment
