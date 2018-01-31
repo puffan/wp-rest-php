@@ -81,8 +81,12 @@ class WPAPICommentCache{
         }
         //end foreach
         
-        $this->setAllCommentListCache( $postId , $rstArr ) ;
-        return $rstArr ;
+        if( !$rstArr ){
+            return false ;
+        }else{
+            $this->setAllCommentListCache( $postId , $rstArr ) ;
+            return $rstArr ;
+        }
     }
     
     
@@ -98,9 +102,9 @@ class WPAPICommentCache{
 
         $postId = intval( $postId ) ;
        
-        $startEndArr = PageUtil::formatStartEnd( $currentPageNum , $perPage ) ;
+        $startEndArr = PageUtil::formatStartLength( $currentPageNum , $perPage ) ;
         $start = $startEndArr['start'] ; 
-        $end = $startEndArr['end'] ; 
+        $length = $startEndArr['length'] ; 
         
         $rstArr = $this->getAllCommentListCache( $postId ) ;
         if( !$rstArr ){
@@ -109,7 +113,7 @@ class WPAPICommentCache{
         if( !$rstArr || sizeof( $rstArr ) == 0 ){
             return false ;
         }
-        
+               
         //fort parent list what to be want
         
         $isOrderDefault = true ;
@@ -120,7 +124,7 @@ class WPAPICommentCache{
         //end
         
         
-        $resultArr = array_slice( $rstArr ,  $start , $end ) ;
+        $resultArr = array_slice( $rstArr ,  $start , $length ) ;
         $dataObj = (object)array() ;
         
         $listData = array() ;
@@ -168,9 +172,9 @@ class WPAPICommentCache{
         $parentCommentId = intval( $parentCommentId ) ;
         $postId = intval( $postId ) ;
 
-        $startEndArr = PageUtil::formatStartEnd( $currentPageNum , $perPage ) ;
+        $startEndArr = PageUtil::formatStartLength( $currentPageNum , $perPage ) ;
         $start = $startEndArr['start'] ;
-        $end = $startEndArr['end'] ;
+        $length = $startEndArr['length'] ;
         
         $isOrderDefault = true ;
         if( strtolower( $order ) != self::VALID_ORDER_DEFAULT ){
@@ -189,12 +193,14 @@ class WPAPICommentCache{
         $child = array() ;
         
         $resultArr = array() ;
+        $childCount = 0 ;
         if( isset( $rstArr[$parentCommentId] )  && isset( $rstArr[$parentCommentId][1] )  ){
             $listDataObj =  WPAPICommentFilter::formatSingleCommentObjByRules( $rstArr[$parentCommentId][0] , WPAPICommentFilter::COMMON_RULES_ONLY_GZUNCOMPRESS ) ;
+            $childCount = sizeof( $rstArr[$parentCommentId][1]) ;
             if( $isOrderDefault ){
-                $resultArr = array_slice( $rstArr[$parentCommentId][1] ,  $start , $end ) ;
+                $resultArr = array_slice( $rstArr[$parentCommentId][1] ,  $start , $length ) ;
             }else{
-                $resultArr = array_slice( array_reverse ( $rstArr[$parentCommentId][1] ) ,  $start , $end ) ;
+                $resultArr = array_slice( array_reverse ( $rstArr[$parentCommentId][1] ) ,  $start , $length ) ;
             }
             $resultArr = WPAPICommentFilter::formatMultipleCommentObjByRules( $resultArr , WPAPICommentFilter::COMMON_RULES_ONLY_GZUNCOMPRESS ) ;
         }
@@ -205,7 +211,7 @@ class WPAPICommentCache{
             $dataObj->parentCount = 1 ;
             $dataObj->listData = $listDataObj ;
         }else{
-            $listDataObj->childCount = sizeof( $resultArr ) ;
+            $listDataObj->childCount = $childCount ;
             $listDataObj->child = $resultArr ;
             $dataObj->parentCount = 1 ;
             $dataObj->listData = $listDataObj ;

@@ -73,6 +73,7 @@ class PageUtil{
    
    index_start = (pagenum-1)* perpage  =  0
    index_end   = index_start + perpage - 1 =  2
+   length = 3 
    
 
 
@@ -82,11 +83,12 @@ class PageUtil{
 
    index_start = (pagenum-1)* perpage  = 3
    index_end   = index_start + perpage - 1 = 6
+   length = 3 
    
      * @param unknown $currentPageNum
      * @param unknown $perPage
      */
-    public static function formatStartEnd(  $currentPageNum , $perPage ){
+    public static function formatStartLength(  $currentPageNum , $perPage ){
         $currentPageNum = intval( $currentPageNum ) ;
         if( $currentPageNum <= 0 ){
             $currentPageNum = 1 ;
@@ -98,7 +100,7 @@ class PageUtil{
         }
         
         $resultArr[ 'start' ] = ($currentPageNum-1) * $perPage ;
-        $resultArr[ 'end' ] = $resultArr[ 'start' ] + $perPage - 1 ;
+        $resultArr[ 'length' ] = $perPage ; //  $resultArr[ 'start' ] + $perPage - 1 ;
         
         return $resultArr ;
     }
