@@ -3,6 +3,7 @@ namespace App\Cache\WPAPICache ;
 
 use App\Models\WPAPIModel\WPAPIPostModel;
 use Cache;
+use App\Utils\WPAPIRedisUtil;
 use App\Utils\WPAPISiteUtil;
 use App\Utils\Filters\WPAPIPostFilter;
 
@@ -25,6 +26,9 @@ class WPAPIPostCache{
     }
     
     private function setPostDetailCache( $postId , $postDetail ){
+        if( !WPAPIRedisUtil::isRedisOK() ){
+            return false ;
+        }
         $rKeyPostDetail = WPAPISiteUtil::getWPAPICacheRedisKeyCommonPrefix().self::rKeyPostDetail.$postId ;
         $expireMinutes = self::VALID_REDIS_EXPIRE_MINUTES_DEFAULT ;
         if( intval( config( 'cache.default.time' ) ) ){
@@ -35,6 +39,9 @@ class WPAPIPostCache{
     
     
     private function getPostDetailCache( $postId ){
+        if( !WPAPIRedisUtil::isRedisOK() ){
+            return false ;
+        }
         $rKeyPostDetail = WPAPISiteUtil::getWPAPICacheRedisKeyCommonPrefix().self::rKeyPostDetail.$postId ;
         $postDetail = Cache::get( $rKeyPostDetail ) ;
         if( !$postDetail ){
@@ -51,7 +58,9 @@ class WPAPIPostCache{
             return false ;
         }else{
             $postDetail = WPAPIPostFilter::formatSinglePostObjByRules( $postDetail , WPAPIPostFilter::COMMON_RULES_DEFAULT_AND_GZ ) ;
-            $this->setPostDetailCache($postId, $postDetail) ;
+            if( WPAPIRedisUtil::isRedisOK() ){
+                $this->setPostDetailCache($postId, $postDetail) ;
+            }
             return $postDetail ;
         }
     }
@@ -75,6 +84,9 @@ class WPAPIPostCache{
     
     
     private function setCommentCountCache( $postId , $commentCount ){
+        if( !WPAPIRedisUtil::isRedisOK() ){
+            return false ;
+        }
         $rKeyCommentCount = WPAPISiteUtil::getWPAPICacheRedisKeyCommonPrefix().self::rKeyCommentCount.$postId ;
         $expireMinutes = self::VALID_REDIS_EXPIRE_MINUTES_DEFAULT ;
         if( intval( config( 'cache.default.time' ) ) ){
@@ -85,6 +97,9 @@ class WPAPIPostCache{
     
     
     private function getCommentCountCache( $postId ){
+        if( !WPAPIRedisUtil::isRedisOK() ){
+            return false ;
+        }
         $rKeyCommentCount = WPAPISiteUtil::getWPAPICacheRedisKeyCommonPrefix().self::rKeyCommentCount.$postId ;
         $commentCount = Cache::get( $rKeyCommentCount ) ;
         if( 0 === $commentCount ){
@@ -112,8 +127,9 @@ class WPAPIPostCache{
         }else{
             $commentCount = intval( $postCommentCountObj->comment_count ) ;// 
         }
-        
-        $this->setCommentCountCache($postId, $commentCount) ;
+        if( WPAPIRedisUtil::isRedisOK() ){
+            $this->setCommentCountCache($postId, $commentCount) ;
+        }
         return $commentCount ;
     }
     

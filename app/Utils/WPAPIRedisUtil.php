@@ -8,7 +8,7 @@ namespace App\Utils ;
  */
 class WPAPIRedisUtil {
     
-    const VALID_REDIS_SWITCH_OPEN_VALUE = 'open' ;
+    const VALID_REDIS_SWITCH_OPEN_VALUE = 'on' ;
     
     public static function isRedisOK(){
         

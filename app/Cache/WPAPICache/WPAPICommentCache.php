@@ -4,6 +4,7 @@ use Cache ;
 use App\Models\WPAPIModel\WPAPICommentModel;
 use App\Utils\Filters\WPAPICommentFilter;
 use App\Utils\PageUtil;
+use App\Utils\WPAPIRedisUtil;
 use App\Utils\WPAPISiteUtil;
 
 class WPAPICommentCache{
@@ -14,6 +15,9 @@ class WPAPICommentCache{
     const VALID_CAN_LOAD_TO_CACHE_LIMIT = 1000 ;  //
     
     private function getAllCommentListCache( $postId ){
+        if( !WPAPIRedisUtil::isRedisOK() ){
+            return false ;
+        }
         $rKeyFullAllCommentList = WPAPISiteUtil::getWPAPICacheRedisKeyCommonPrefix().self::rKeyAllCommentList.$postId ;
         $allCommentList = Cache::get( $rKeyFullAllCommentList ) ;
         if( !$allCommentList ){
@@ -24,6 +28,9 @@ class WPAPICommentCache{
     }
     
     private function setAllCommentListCache( $postId , $allCommentList ){
+        if( !WPAPIRedisUtil::isRedisOK() ){
+            return false ;
+        }
         $rKeyFullAllCommentList = WPAPISiteUtil::getWPAPICacheRedisKeyCommonPrefix().self::rKeyAllCommentList.$postId ;
         $expireMinutes = self::VALID_REDIS_EXPIRE_MINUTES_DEFAULT ;
         if( intval( config( 'cache.default.time' ) ) ){
@@ -84,7 +91,9 @@ class WPAPICommentCache{
         if( !$rstArr ){
             return false ;
         }else{
-            $this->setAllCommentListCache( $postId , $rstArr ) ;
+            if( WPAPIRedisUtil::isRedisOK() ){
+                $this->setAllCommentListCache( $postId , $rstArr ) ;
+            }
             return $rstArr ;
         }
     }

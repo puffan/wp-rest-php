@@ -6,6 +6,7 @@ use App\Models\WPAPIModel\WPAPIPostModel;
 use Cache;
 use App\Utils\Filters\WPAPICategoryFilter;
 use App\Utils\Filters\WPAPIPostFilter;
+use App\Utils\WPAPIRedisUtil;
 use App\Utils\WPAPISiteUtil ;
 
 class WPAPICategoryCache{
@@ -23,7 +24,6 @@ class WPAPICategoryCache{
         if( !$categoryList ){
             return false ;
         }else{
-            $this->setCategoryListCache( $categoryList ) ;
             return $categoryList ;
         }
        
@@ -31,6 +31,9 @@ class WPAPICategoryCache{
     
  
     private function setCategoryListCache( $categoryList ){
+        if( !WPAPIRedisUtil::isRedisOK() ){
+            return false ;
+        }
         $rKeyCategoryList = WPAPISiteUtil::getWPAPICacheRedisKeyCommonPrefix().self::rKeyCategoryList ;
         $expireMinutes = self::VALID_REDIS_EXPIRE_MINUTES_DEFAULT ;
         if( intval( config( 'cache.default.time' ) ) ){
@@ -41,6 +44,9 @@ class WPAPICategoryCache{
     
     
     private function getCategoryListCache(){
+        if( !WPAPIRedisUtil::isRedisOK() ){
+            return false ;
+        }
         $rKeyCategoryList = WPAPISiteUtil::getWPAPICacheRedisKeyCommonPrefix().self::rKeyCategoryList ;
         $categoryList = Cache::get( $rKeyCategoryList ) ;
         if( !$categoryList ){
@@ -64,6 +70,9 @@ class WPAPICategoryCache{
         if( !$categoryMultipleObj ){
             return false ;
         }else{
+            if( WPAPIRedisUtil::isRedisOK() ){
+                $this->setCategoryListCache( $categoryMultipleObj ) ;
+            }
             return $categoryMultipleObj ;
         }
     }
