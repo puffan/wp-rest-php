@@ -37,6 +37,23 @@ class WPAPIPostCache{
         Cache::put( $rKeyPostDetail , $postDetail , $expireMinutes  ) ;
     }
     
+    private function setCategorySPostIdListCache( $postId , $postDetail ){
+        if( !$postId || !$postDetail ){
+            return false ;
+        }
+        
+        $categoryList = $postDetail->categories ;
+        if( !$categoryList ){
+            return false ;
+        }
+        
+        $wpAPICategoryCache = new WPAPICategoryCache() ;
+        foreach( $categoryList as $key=>$value ){
+            $termId = $value->term_id ;
+            $wpAPICategoryCache->setCategorySPostIdListCache($termId, $postId) ;
+        }
+        
+    }
     
     private function getPostDetailCache( $postId ){
         if( !WPAPIRedisUtil::isRedisOK() ){
@@ -60,6 +77,7 @@ class WPAPIPostCache{
             $postDetail = WPAPIPostFilter::formatSinglePostObjByRules( $postDetail , WPAPIPostFilter::COMMON_RULES_DEFAULT_AND_GZ ) ;
             if( WPAPIRedisUtil::isRedisOK() ){
                 $this->setPostDetailCache($postId, $postDetail) ;
+                $this->setCategorySPostIdListCache($postId, $postDetail) ;
             }
             return $postDetail ;
         }

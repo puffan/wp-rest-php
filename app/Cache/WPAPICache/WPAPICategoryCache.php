@@ -11,9 +11,21 @@ use App\Utils\WPAPISiteUtil ;
 
 class WPAPICategoryCache{
     
-    const rKeyCategoryList = 'category_list' ;
+    const rKeyCategoryList         = 'category_list' ;
+    const rKeyCategorySPostIdList  = 'category_s_postid_list_' ;
    
     const VALID_REDIS_EXPIRE_MINUTES_DEFAULT = 1440 ;
+    
+    public function setCategorySPostIdListCache( $termId  , $postId ){
+        $termId = intval( $termId ) ;
+        $postId = intval( $postId ) ;
+        
+        if( !WPAPIRedisUtil::isRedisOK() ){
+            return false ;
+        }
+        $rKeyCategorySPostIdList = WPAPIRedisUtil::getWPAPICacheRedisKeyCommonPrefix().':'.WPAPISiteUtil::getWPAPICacheRedisKeyCommonPrefix().self::rKeyCategorySPostIdList.$termId ;
+        Cache::connection()->sadd(  $rKeyCategorySPostIdList , $postId ) ;
+    }
     
     public function getCategoryList(){
         $categoryList = $this->getCategoryListCache() ;
