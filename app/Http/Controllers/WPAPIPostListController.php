@@ -25,6 +25,7 @@ class WPAPIPostListController extends WPAPIBaseController
         parent::__construct();
     }
 
+    /*
     public function getPostList( Request $req ){
         $termId = intval( $req->input( 'categories' ) ) ;
         if( empty( $termId ) ){
@@ -47,6 +48,39 @@ class WPAPIPostListController extends WPAPIBaseController
         $postListArr = $wpAPIHomeCache->getPostList($termId,$offset,$limit,$order) ;
         if( !$postListArr ){
             //Response::sendError( Response::MSG_PARAMETER_ERROR.'this post not found,posid='.$postId ) ;
+            Response::sendSuccess((object)array());  //empty object {}
+        }else{
+            Response::sendSuccess($postListArr);
+        }
+    } */
+    
+    /**
+     * Refactor by chenyiwei on 20180205 
+     * Add cache
+     * 
+     * @param Request $req
+     */
+    public function getPostList( Request $req ){
+        $termId = intval( $req->input( 'categories' ) ) ;
+        if( empty( $termId ) ){
+            Response::sendError( Response::MSG_PARAMETER_ERROR.'categories is empty' ) ;
+        }
+        $currentPageNum = empty( intval( $req->input( 'page' ) ) ) ? self::VALID_CURRENT_PAGE_NUM_DEFAULT : intval( $req->input( 'page' ) ) ;
+        $perPage = empty( intval( $req->input( 'per_page' ) ) ) ? self::VALID_PER_PAGE_DEFAULT : intval( $req->input( 'per_page' ) ) ;
+        
+        if( $perPage > self::VALID_PER_PAGE_MAX ){
+            $perPage = self::VALID_PER_PAGE_MAX ;
+        }
+        $order = strtolower( trim( $req->input( 'order' ) ) ) ;
+        
+        if( !array_key_exists( $order , self::VALID_ORDER_VALUE ) ) {
+            $order = self::VALID_ORDER_DEFAULT ;
+        }
+       
+        $wpAPIHomeCache = new WPAPIPostListCache() ;
+        $postListArr = $wpAPIHomeCache->getPostList( $termId, $currentPageNum , $perPage , $order ) ;
+        
+        if( !$postListArr ){
             Response::sendSuccess((object)array());  //empty object {}
         }else{
             Response::sendSuccess($postListArr);

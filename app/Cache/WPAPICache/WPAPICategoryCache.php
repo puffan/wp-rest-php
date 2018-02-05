@@ -83,7 +83,7 @@ class WPAPICategoryCache{
         $rKeyCategorySPostIdList = self::getRKeyCategorySPostIdList( $termId ) ;
 
         //$categorySPostIdList = Cache::connection()->ZRANGEBYSCORE(  $rKeyCategorySPostIdList , '-inf' , '+inf' ) ;
-        $categorySPostIdList = Cache::connection()->ZREVRANGEBYSCORE (  $rKeyCategorySPostIdList , '+inf' , '-inf' ) ;
+        $categorySPostIdList = Cache::connection()->ZREVRANGEBYSCORE (  $rKeyCategorySPostIdList , '+inf' , '-inf' ) ;  // eqauls :  order by post_id desc 
 
         if( !$categorySPostIdList ){
             return false ;
