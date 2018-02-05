@@ -15,11 +15,6 @@ class WPAPIPostCache{
     
     //add by chenyiwei on 20180202
     public function getPostDetailBatch( $postIdArr ){
-        //batch get post detail from redis cache
-        //batch get post detail from database
-        
-       // $wpAPIPostModel = new WPAPIPostModel() ;
-       // $postDetailList = $wpAPIPostModel->getPostDetailByIdBatch( $postIdArr ) ;
         $postDetailArr = array() ;
         foreach( $postIdArr as $key=>$value ){
             $value = intval($value) ;
@@ -55,25 +50,7 @@ class WPAPIPostCache{
         Cache::put( $rKeyPostDetail , $postDetail , $expireMinutes  ) ;
     }
     
-    /*
-    private function setCategorySPostIdListCache( $postId , $postDetail ){
-        if( !$postId || !$postDetail ){
-            return false ;
-        }
-        
-        $categoryList = $postDetail->categories ;
-        if( !$categoryList ){
-            return false ;
-        }
-        
-        $wpAPICategoryCache = new WPAPICategoryCache() ;
-        foreach( $categoryList as $key=>$value ){
-            $termId = $value->term_id ;
-            $wpAPICategoryCache->setCategorySPostIdListCache($termId, $postId) ;
-        }
-        
-    }*/
-    
+
     private function getPostDetailCache( $postId ){
         if( !WPAPIRedisUtil::isRedisOK() ){
             return false ;
@@ -96,20 +73,11 @@ class WPAPIPostCache{
             $postDetail = WPAPIPostFilter::formatSinglePostObjByRules( $postDetail , WPAPIPostFilter::COMMON_RULES_DEFAULT_AND_GZ ) ;
             if( WPAPIRedisUtil::isRedisOK() ){
                 $this->setPostDetailCache($postId, $postDetail) ;
-                // $this->setCategorySPostIdListCache($postId, $postDetail) ;
             }
             return $postDetail ;
         }
     }
-    
-    
-    //add by chenyiwei on 20180202
-    private function initPostDetailToCacheBatch( $postIdArr ){
-        
-    }
-    //end
-    
-    
+
     
     public function getCommentCount( $postId ){
         $commentCount = $this->getCommentCountCache($postId) ;
