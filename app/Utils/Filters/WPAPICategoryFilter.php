@@ -12,10 +12,15 @@ class WPAPICategoryFilter{
     const VALID_TERMMETA_META_VALUE_FALSE = 'false' ;
     const VALID_TERMMETA_META_VALUE_YES = 'yes' ;
     
+    const VALID_DEFAULT_CATEGORY_NAME_CN = '未分类' ;
+    const VALID_DEFAULT_CATEGORY_NAME_EN = 'uncategorized' ;
+    const VALID_DEFAULT_CATEGORY_ID      =  1 ;
+    
     
     const FORMAT_FUNC_STR = 'formatCategoryObj' ;
     const RULE_PARENT = 'Parent' ;
-    const COMMON_RULES_DEFAULT = [self::RULE_PARENT ] ;
+    const RULE_REMOVE_DEFAULT = 'RemoveDefault' ;
+    const COMMON_RULES_DEFAULT = [self::RULE_PARENT , self::RULE_REMOVE_DEFAULT ] ;
     
    
     
@@ -27,6 +32,12 @@ class WPAPICategoryFilter{
         $termIdArr = array() ;
         $termIdKeyArr = array() ;
         foreach( $categoryMultipleObj as $key=>$value ){
+            
+            if(    in_array( self::RULE_REMOVE_DEFAULT , $ruleArr )
+                && self::isDefaultCategory( $value->id , $value->name ) ){   //default category, not put to category list. by chenyiwei on 20180205
+                continue ;
+            }
+            
             $termIdArr[$key] = $value->id ;
             $termIdKeyArr[$value->id] = self::formatSingleCategoryObjByRules( $value , $ruleArr ) ; //change parent to be 0
         }
@@ -66,6 +77,26 @@ class WPAPICategoryFilter{
         return $singleCategoryObj ;
     }
     
+    /**
+     * is default category ?
+     * 
+     * @param unknown $categoryId
+     * @param unknown $categoryNameCn
+     * @param unknown $categoryNameEn
+     * @return boolean
+     */
+    private static function isDefaultCategory( $categoryId , $categoryName ){
+        $categoryId = intval( $categoryId ) ; 
+        if( $categoryId == self::VALID_DEFAULT_CATEGORY_ID ){
+            if( $categoryName== self::VALID_DEFAULT_CATEGORY_NAME_CN 
+                || $categoryName == self::VALID_DEFAULT_CATEGORY_NAME_EN ){
+               return true ;   
+            }
+            
+        }
+        
+        return false ;
+    } 
     
     private static function formatCategoryObjParent( $singleCategoryObj ){
         if( !$singleCategoryObj ){
@@ -75,5 +106,9 @@ class WPAPICategoryFilter{
         return $singleCategoryObj ;
     }
     
+    private static function formatCategoryObjRemoveDefault( $singleCategoryObj ){
+       //do nothing 
+        return $singleCategoryObj ;
+    }
     
 }

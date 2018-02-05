@@ -11,6 +11,24 @@ use App\Utils\WPAPISiteUtil ;
  */
 class WPAPICategoryModel{
     
+    
+    //add by chenyiwei on 20180202
+    public function getCategorySPostIdByTermId( $termId ){
+        $termId = intval( $termId ) ;
+        $sql = 'select pt.ID as post_ID from wp_2_term_relationships as tr inner join wp_2_term_taxonomy as tt on tr.term_taxonomy_id=tt.term_taxonomy_id '.
+                    'inner join wp_2_posts as pt on tr.object_id=pt.ID '.
+                    'where tt.term_id='.$termId.' '.
+                    'order by pt.ID desc';
+        $rs = DB::select( $sql ) ;
+        if( !$rs ){
+            return false ;
+        }else{
+            return $rs ;
+        }
+    }
+    //end
+    
+    
     public function getCategoryList(){
         $sql = 'select t.term_id as id, tt.count as count, t.name as name, tt.taxonomy as taxonomy, tt.parent as parent from '.WPAPISiteUtil::getSiteTableName('wp_%_terms').' as t inner join '.WPAPISiteUtil::getSiteTableName('wp_%_term_taxonomy').' as tt on t.term_id=tt.term_id where tt.taxonomy in (\'category\') order by t.name ASC' ;
         $rs = DB::select( $sql ) ;
