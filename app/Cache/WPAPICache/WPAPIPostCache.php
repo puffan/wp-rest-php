@@ -18,7 +18,7 @@ class WPAPIPostCache{
         $postDetailArr = array() ;
         foreach( $postIdArr as $key=>$value ){
             $value = intval($value) ;
-            $postDetail = self::getPostDetail( $value ) ;
+            $postDetail = $this->getPostDetail( $value ) ;
             $postDetailArr[$value] = $postDetail ;   //[0] = detail 9
        }
        
@@ -30,6 +30,8 @@ class WPAPIPostCache{
        $postDetail = $this->getPostDetailCache($postId) ;
        if( !$postDetail ){
            $postDetail = $this->initPostDetailToCache($postId) ;
+       }else{
+           $postDetail = $this->refreshPostDetailCacheSCategory( $postDetail ) ;
        }
        if( !$postDetail ){
            return false ;
@@ -78,6 +80,53 @@ class WPAPIPostCache{
         }
     }
 
+    
+    //add by chenyiwei on 20180208
+    private function refreshPostDetailCacheSCategory( $postDetail ){
+        if( !WPAPIRedisUtil::isRedisOK() ){
+            return $postDetail ;
+        }
+        $wpAPICache = new WPAPICategoryCache() ;
+        $categoryList = $wpAPICache->getCategoryList() ;
+        $categoryPostDetail = $postDetail->categories ;
+        if( !$categoryPostDetail || sizeof( $categoryPostDetail ) == 0 ){
+            return $postDetail ;
+        } 
+        
+        $refreshedTermArr = array() ;
+        
+        foreach( $categoryPostDetail as $key=>$value ){
+            $termId = $value->term_id ;
+            $termName = $value->term_name ;
+            $termStillExist = false ;
+            foreach( $categoryList as $keyCate=>$valueCate ){
+                if( $valueCate->id == $termId ){
+                    $termName = $valueCate->name ;
+                    $termStillExist = true ;
+                    break ;
+                }
+            }
+            if( $termStillExist ){
+                $termObj = new \stdClass() ;
+                $termObj->term_id = $termId ;
+                $termObj->term_name = $termName ;
+                $refreshedTermArr[$termId] = $termObj ;
+            }
+            
+        }
+        
+        if( $refreshedTermArr ){
+            $refreshedTermArr = array_values( $refreshedTermArr ) ; //reset index from 0 , 1 , 2 ..........
+        }
+        
+        $postDetail->categories = $refreshedTermArr ;
+        
+        
+        return $postDetail ;
+        
+    }
+    
+    //
     
     public function getCommentCount( $postId ){
         $commentCount = $this->getCommentCountCache($postId) ;
