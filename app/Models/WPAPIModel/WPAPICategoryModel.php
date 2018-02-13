@@ -17,7 +17,7 @@ class WPAPICategoryModel{
         $termId = intval( $termId ) ;
         $sql = 'select pt.ID as post_ID from wp_2_term_relationships as tr inner join wp_2_term_taxonomy as tt on tr.term_taxonomy_id=tt.term_taxonomy_id '.
                     'inner join wp_2_posts as pt on tr.object_id=pt.ID '.
-                    'where tt.term_id='.$termId.' '.
+                    "where tt.term_id='.$termId.' and pt.post_status='publish' ".
                     'order by pt.ID desc';
         $rs = DB::select( $sql ) ;
         if( !$rs ){
