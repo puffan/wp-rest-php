@@ -15,9 +15,9 @@ class WPAPICategoryModel{
     //add by chenyiwei on 20180202
     public function getCategorySPostIdByTermId( $termId ){
         $termId = intval( $termId ) ;
-        $sql = 'select pt.ID as post_ID from wp_2_term_relationships as tr inner join wp_2_term_taxonomy as tt on tr.term_taxonomy_id=tt.term_taxonomy_id '.
-                    'inner join wp_2_posts as pt on tr.object_id=pt.ID '.
-                    "where tt.term_id='.$termId.' and pt.post_status='publish' ".
+        $sql = 'select pt.ID as post_ID from '.WPAPISiteUtil::getSiteTableName('wp_%_term_relationships').' as tr inner join '.WPAPISiteUtil::getSiteTableName('wp_%_term_taxonomy').' as tt on tr.term_taxonomy_id=tt.term_taxonomy_id '.
+            'inner join '.WPAPISiteUtil::getSiteTableName('wp_%_posts').' as pt on tr.object_id=pt.ID '.
+                    "where tt.term_id=".$termId." and pt.post_status='publish' ".
                     'order by pt.ID desc';
         $rs = DB::select( $sql ) ;
         if( !$rs ){
