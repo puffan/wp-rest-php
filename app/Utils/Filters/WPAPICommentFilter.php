@@ -1,7 +1,7 @@
 <?php
 namespace App\Utils\Filters ;
 
-use App\Utils\WPAPIUserUtil;
+use App\Cache\WPAPICache\WPAPIUserCache;
 
 
 class WPAPICommentFilter{
@@ -74,12 +74,14 @@ class WPAPICommentFilter{
     }
     
     private static function formatCommentObjUser( $singleCommentObj ){
-        $wpSingleUserMeta = WPAPIUserUtil::getWPSingleUserMetaById( $singleCommentObj->author ) ;
-        if( !$wpSingleUserMeta || !$wpSingleUserMeta->meta_value ){
+        //$wpSingleUserMeta = WPAPIUserUtil::getWPSingleUserMetaById( $singleCommentObj->author ) ;
+        $wpAPIUserCache = new WPAPIUserCache() ;
+        $user = $wpAPIUserCache->getUser( $singleCommentObj->author ) ;
+        if( !$user || !$user->accountid ){
             $singleCommentObj->accountid = '' ; // not find accountid , set accountid to emtpy
             return $singleCommentObj ;
         }else{
-            $singleCommentObj->accountid = $wpSingleUserMeta->meta_value ;
+            $singleCommentObj->accountid = $user->accountid ;
             return $singleCommentObj ;
         }
     }

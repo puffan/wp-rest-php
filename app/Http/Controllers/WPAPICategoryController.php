@@ -5,7 +5,6 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use App\Cache\WPAPICache\WPAPICategoryCache;
 use App\Components\Response;
-use App\Models\WPAPIModel\WPAPICategoryModel;
 use App\Utils\Filters\WPAPICategoryFilter ;
 
 /**

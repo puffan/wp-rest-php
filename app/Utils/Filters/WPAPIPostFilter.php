@@ -1,9 +1,10 @@
 <?php
 namespace App\Utils\Filters ;
 
+use App\Cache\WPAPICache\WPAPIUserCache;
 use App\Models\WPAPIModel\WPAPICategoryModel;
 use App\Models\WPAPIModel\WPAPIModel;
-use App\Utils\WPAPIUserUtil;
+
 
 
 class WPAPIPostFilter{
@@ -49,19 +50,22 @@ class WPAPIPostFilter{
     }
     
     private static function formatPostObjUser( $singlePostObj ){
-        $wpSingleUserMeta = WPAPIUserUtil::getWPSingleUserMetaById( $singlePostObj->author ) ;
-        $wpSingleUser = WPAPIUserUtil::getWPSingleUserById( $singlePostObj->author ) ;
+        //$wpSingleUserMeta = WPAPIUserUtil::getWPSingleUserMetaById( $singlePostObj->author ) ;
+        //$wpSingleUser = WPAPIUserUtil::getWPSingleUserById( $singlePostObj->author ) ;
         
-        if( !$wpSingleUserMeta || !$wpSingleUserMeta->meta_value ){
+        $wpAPIUserCache = new WPAPIUserCache() ;
+        $user = $wpAPIUserCache->getUser( $singlePostObj->author ) ;
+        
+        if( !$user || !$user->accountid ){
             $singlePostObj->welink_accountid = '' ; // not find accountid , set accountid to emtpy
         }else{
-            $singlePostObj->welink_accountid = $wpSingleUserMeta->meta_value ;
+            $singlePostObj->welink_accountid = $user->accountid ;
         }
         
-        if( !$wpSingleUser || !$wpSingleUser->user_nicename ){
+        if( !$user || !$user->user_nicename ){
             $singlePostObj->welink_nameCn = '' ;
         }else{
-            $singlePostObj->welink_nameCn = $wpSingleUser->user_nicename ;
+            $singlePostObj->welink_nameCn = $user->user_nicename ;
         }
         
         return $singlePostObj ;

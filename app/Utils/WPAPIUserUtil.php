@@ -12,7 +12,7 @@ use App\Models\WPAPIModel\WPAPIUserModel;
  */
 class WPAPIUserUtil{
 
-    public static function getWPSingleUserById( $userId ){
+    /*public static function getWPSingleUserById( $userId ){
         $wpUserModel = new WPAPIUserModel() ;
         $wpSingleUserObj = $wpUserModel->getWPSingleUserById( $userId ) ;
         return $wpSingleUserObj ;
@@ -22,6 +22,6 @@ class WPAPIUserUtil{
         $wpUserModel = new WPAPIUserModel() ;
         $wpSingleUserMetaObj = $wpUserModel->getWPSingleUserMetaById( $userId ) ;
         return $wpSingleUserMetaObj ;
-    }
+    }*/
     
 }

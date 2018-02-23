@@ -8,9 +8,10 @@
 
 namespace App\Utils\Filters;
 
+use App\Cache\WPAPICache\WPAPIUserCache;
 use App\Models\WPAPIModel\WPAPICategoryModel;
 use App\Models\WPAPIModel\WPAPIModel;
-use App\Utils\WPAPIUserUtil;
+
 
 
 class WPAPIHomeFilter
@@ -87,11 +88,20 @@ class WPAPIHomeFilter
     private static function formatListData($postListObj){
         $listDataArr = array();
         $postModel = new WPAPIModel();
-        $userUtil = new WPAPIUserUtil();
+        //$userUtil = new WPAPIUserUtil();
+        $wpAPIUserCache = new WPAPIUserCache() ;
+        
         foreach ($postListObj as $key=> $value){
             $listDataArr[$key]['welink_createTime'] = $value->post_date;
             $listDataArr[$key]['welink_imgData'] = $postModel->getPostImgData($value->ID);
-            $listDataArr[$key]['welink_nameCn'] = $userUtil->getWPSingleUserById($value->post_author)->user_login;
+            
+            $user = $wpAPIUserCache->getUser( $value->post_author ) ;
+            if( !$user || !$user->user_login ){
+                $listDataArr[$key]['welink_nameCn'] = ''  ;   //$userUtil->getWPSingleUserById($value->post_author)->user_login;
+            }else{
+                $listDataArr[$key]['welink_nameCn'] = $user->user_login ;  
+            }
+            
             $listDataArr[$key]['id'] = $value->ID;
             $listDataArr[$key]['welink_title'] = $value->post_title;
         }
