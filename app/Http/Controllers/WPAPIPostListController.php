@@ -52,7 +52,7 @@ class WPAPIPostListController extends WPAPIBaseController
         $postListArr = $wpAPIHomeCache->getPostList( $termId, $currentPageNum , $perPage , $order ) ;
         
         if( !$postListArr ){
-            Response::sendSuccess((object)array());  //empty object {}
+            Response::sendSuccess(array());  //empty []
         }else{
             Response::sendSuccess($postListArr);
         }
