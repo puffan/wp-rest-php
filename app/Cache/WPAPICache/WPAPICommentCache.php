@@ -127,7 +127,7 @@ class WPAPICommentCache{
         
         $isOrderDefault = true ;
         if( strtolower( $order ) != self::VALID_ORDER_DEFAULT ){
-            $allCommentList = array_reverse( $allCommentList ) ;  //reverse array
+            $rstArr = array_reverse( $rstArr ) ;  //reverse array
             $isOrderDefault = false ;
         }
         //end
