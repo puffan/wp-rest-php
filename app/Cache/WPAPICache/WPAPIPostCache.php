@@ -36,6 +36,36 @@ class WPAPIPostCache{
        if( !$postDetail ){
            return false ;
        }else{
+           //added bu liuhongqiang 20180314 add videoData
+           if($postDetail->content){
+               $content = $postDetail->content;
+               $pos1 = strpos($content,'[video ');
+               $pos2 = strpos($content,'][/video]');
+               if($pos1&&$pos2){
+                   $content1 = substr($content,0,$pos1);
+                   $content3 = substr($content,$pos2+9,strlen($content));
+                   $content2 = substr($content,$pos1,$pos2-$pos1+9);
+                   $videoArr = explode(" ",$content2);
+                   $videoData = array();
+                   if($videoArr[3]){
+                       $videoUrlArr = explode('"',$videoArr[3]);
+                       $videoUrl = $videoUrlArr[1];
+                       $videoData['resourceUrl'] = $videoUrl;
+                   }
+                   $postDetail->content = $content1.$content3;
+                   $videoData['videoCover'] = $postDetail->welink_imgData;
+                   $videoData['videoSize'] = "";
+                   $videoData['videoTitle'] =  $postDetail->welink_title;
+                   $videoData['videoSummary'] =  "";
+                   $videoData['videoAuthor'] =  $postDetail->welink_nameCn;
+                   $videoData['videoCreateTime'] =  $postDetail->welink_createTime;
+                   $videoData['videoPcUrl'] = "";
+                   $postDetail->videoData = $videoData;
+               }
+               else{
+                   $postDetail->videoData = array();
+               }
+           }
            return $postDetail ;
        }
     }
