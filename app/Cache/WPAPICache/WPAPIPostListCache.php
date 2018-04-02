@@ -57,6 +57,14 @@ class WPAPIPostListCache
                 $postDetailObj->welink_createTime = $pagePostDetailList[$key]->welink_createTime ;
                 $postDetailObj->welink_nameCn = $pagePostDetailList[$key]->welink_nameCn ;
                 $postDetailObj->welink_imgData = $pagePostDetailList[$key]->welink_imgData ;
+                //added by liuhongqiang 20180320 add videoPcUrl  videoPic
+                if($value->videoData){
+                    $postDetailObj->welink_url = str_replace('archives','video',$pagePostDetailList[$key]->welink_url);
+                    $postDetailObj->videoPic = $pagePostDetailList[$key]->welink_imgData;
+                }else{
+                    $postDetailObj->welink_url = $pagePostDetailList[$key]->welink_url;
+                    $postDetailObj->videoPic = "";
+                }
                 $dataArr[$index] = $postDetailObj ;
                 unset( $postDetailObj ) ;
                 ++$index ;
