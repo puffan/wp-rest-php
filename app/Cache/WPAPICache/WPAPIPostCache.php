@@ -52,7 +52,9 @@ class WPAPIPostCache{
                        $videoUrl = $videoUrlArr[1];
                        $videoData['resourceUrl'] = $videoUrl;
                    }
-                   $postDetail->content = $content1.$content3;
+                   //modified by liuhongqiang 20180323
+                   $postDetail->content = $content1.'[:object]'.$content3;
+                   //set default video number as 1
                    $videoData['videoCover'] = $postDetail->welink_imgData;
                    $videoData['videoSize'] = "";
                    $videoData['videoTitle'] =  $postDetail->welink_title;
@@ -60,7 +62,10 @@ class WPAPIPostCache{
                    $videoData['videoAuthor'] =  $postDetail->welink_nameCn;
                    $videoData['videoCreateTime'] =  $postDetail->welink_createTime;
                    $videoData['videoPcUrl'] = "";
-                   $postDetail->videoData = $videoData;
+                   $videoNum = 1;
+                   for($i=0;$i<$videoNum;$i++) {
+                       $postDetail->videoData[$i] = $videoData;
+                   }
                }
                else{
                    $postDetail->videoData = array();
