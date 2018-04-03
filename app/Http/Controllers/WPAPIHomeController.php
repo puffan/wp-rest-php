@@ -86,7 +86,15 @@ class WPAPIHomeController extends WPAPIBaseController
                     $postDetailObj->imgData = $postDetailListOfOneCategory[$key]->welink_imgData ; 
                     $postDetailObj->nameCn = $postDetailListOfOneCategory[$key]->welink_nameCn ; 
                     $postDetailObj->id = $postDetailListOfOneCategory[$key]->id ; 
-                    $postDetailObj->title = $postDetailListOfOneCategory[$key]->welink_title ; 
+                    $postDetailObj->title = $postDetailListOfOneCategory[$key]->welink_title ;
+                    //added by liuhongqiang 20180321 add videoPcUrl  videoPic
+                    if($value->videoData){
+                        $postDetailObj->welink_url = str_replace('archives','video',$postDetailListOfOneCategory[$key]->welink_url);
+                        $postDetailObj->videoPic = $postDetailListOfOneCategory[$key]->welink_imgData;
+                    }else{
+                        $postDetailObj->welink_url = $postDetailListOfOneCategory[$key]->welink_url;
+                        $postDetailObj->videoPic = "";
+                    }
                     $postDetailArr[$index2] = $postDetailObj ;
                     unset( $postDetailObj ) ;
                     ++$index2 ;
