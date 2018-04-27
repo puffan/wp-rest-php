@@ -73,8 +73,11 @@ class WPAPIModel{
         $guid = self::getPostGuid($meta_value);
         $attachment = self::getAttachment($meta_value);
         $imgFileName = $attachment['sizes']['medium']['file'];
-        $pos = strrpos($guid,'/');
-        $guid = substr($guid,0,$pos+1).$imgFileName;
+	if($imgFileName)
+	{
+	$pos = strrpos($guid,'/');
+	$guid = substr($guid,0,$pos+1).$imgFileName;
+	}
         return $guid;
     }
 
